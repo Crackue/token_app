@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+setup.cfg
+src/endpoints/__init__.py
+src/endpoints/endpoints.py
+src/endpoints_token.egg-info/PKG-INFO
+src/endpoints_token.egg-info/SOURCES.txt
+src/endpoints_token.egg-info/dependency_links.txt
+src/endpoints_token.egg-info/top_level.txt

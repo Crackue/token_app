@@ -1,0 +1,11 @@
+__pycache__
+.history
+.hypot
+hesis/
+.idea
+.env.dev
+.brownie
+.solcx
+.vvm
+scripts
+bot_commands

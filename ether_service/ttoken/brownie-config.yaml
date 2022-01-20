@@ -1,0 +1,74 @@
+project_structure:
+    build: build
+    contracts: contracts
+    interfaces: interfaces
+    reports: reports
+    scripts: scripts
+    tests: tests
+
+networks:
+    default: ${DEFAULT_NETWORK}
+    development:
+        host: http://127.0.0.1
+        gas_price: 0
+        persist: false
+        reverting_tx_gas_limit: 6721975
+        test_rpc:
+            cmd: ganache-cli
+            port: 8545
+            gas_limit: 6721975
+            accounts: 10
+            evm_version: istanbul
+            mnemonic: brownie
+    live:
+        gas_limit: auto
+        gas_buffer: 1.1
+        gas_price: auto
+        max_fee: null
+        priority_fee: null
+        reverting_tx_gas_limit: false
+        default_contract_owner: false
+    ropsten:
+        host: https://ropsten.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+
+compiler:
+    evm_version: null
+    minify_source: false
+    solc:
+        version: null
+        optimize: true
+        runs: 200
+
+console:
+    show_colors: true
+    color_style: monokai
+    auto_suggest: true
+    completions: true
+    editing_mode: emacs
+
+reports:
+    exclude_paths: null
+    exclude_contracts: null
+    only_include_project: true
+
+hypothesis:
+    deadline: null
+    max_examples: 50
+    report_multiple_bugs: False
+    stateful_step_count: 10
+    phases:
+        explicit: true
+        reuse: true
+        generate: true
+        target: true
+        shrink: true
+pytest:
+    # these settings replace the defaults when running pytest
+    gas_limit: 6721975
+    default_contract_owner: true
+    reverting_tx_gas_limit: 6721975
+    revert_traceback: true
+
+autofetch_sources: false
+dependencies: null
+dev_deployment_artifacts: falsev

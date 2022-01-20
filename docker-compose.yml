@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  pypiserverlocalpackages:
+    image: pypiserver/pypiserver:latest
+    container_name: pypiserverlocalpackages
+    volumes:
+      - type: bind
+        source: ./endpoints_token
+        target: /data/packages
+    ports:
+      - "8080:8080"
+
+  botservice:
+    image: bot_service:1.0
+    container_name: bot-service
+    build: ./bot_service
+    depends_on:
+      - pypiserverlocalpackages
+    command: python manage.py runserver 0.0.0.0:8002
+    env_file: .env.dev
+    ports:
+      - "8002:8002"
+    networks:
+      - main
+
+  etherservice:
+    image: ether_service:1.0
+    container_name: ether-service
+    build: ./ether_service
+    depends_on:
+      - botservice
+    command: python manage.py runserver 0.0.0.0:8001
+    env_file: .env.dev
+    ports:
+      - "8001:8001"
+    networks:
+      - main
+
+  userservice:
+    image: user_service:1.0
+    container_name: user-service
+    build: ./user_service
+    depends_on:
+      - botservice
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file: .env.dev
+    ports:
+      - "8000:8000"
+    networks:
+      - main
+
+networks:
+  main:
