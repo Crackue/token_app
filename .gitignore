@@ -3,9 +3,9 @@ __pycache__
 .hypot
 hesis/
 .idea
-.env.dev
 .pypirc
 .python_history
 nohup.out
 Library
 .docker
+.env.prod
