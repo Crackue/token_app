@@ -12,9 +12,7 @@ _service_ = accounts_services.service
 
 @csrf_exempt
 def add(request) -> HttpResponse:
-    post = request.POST
-    key = post["key"]
-    res = _service_.add(key)
+    res = _service_.add(request)
     return HttpResponse(res)
 
 

@@ -47,7 +47,9 @@ class AccountsServicesImpl(AccountsServices):
     def __init__(self):
         self.repository = accounts_repository.repository
 
-    def add(self, key: str) -> str:
+    def add(self, request) -> str:
+        post = request.POST
+        key = post["key"]
         return self.repository.add(key)
 
     def at(self):
