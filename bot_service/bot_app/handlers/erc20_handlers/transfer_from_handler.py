@@ -45,9 +45,9 @@ def get_recipient_name_tr_from(update: Update, context: CallbackContext):
 def get_value_tr_from(update: Update, context: CallbackContext):
     amount = update.message['text']
     value = amount_validate(amount)
-    if value is not None:
+    if isinstance(value, str):
         update.message.reply_text(value + ". Try again")
-        return ConversationHandler.END
+        return VALUE
 
     sender_name = dto['sender_name']
     address_from = base_utils.get_user_address_by_name(sender_name)

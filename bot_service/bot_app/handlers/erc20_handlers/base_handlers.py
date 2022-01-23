@@ -67,13 +67,15 @@ def balance_of(update: Update, context: CallbackContext):
     if not is_logged_in[0]:
         update.message.reply_text(is_logged_in[1])
         return
-
-    response = None
+    obj = {"user_address": is_logged_in[1]}
     try:
-        response = requests.post(ether_erc20_balance_of_endpoint, data=is_logged_in[1])
+        response = requests.post(ether_erc20_balance_of_endpoint, data=obj)
+        resp = json.loads(response.text)
     except Exception as exc:
         logger.exception(exc)
-    resp = json.loads(response.text)
+        update.message.reply_text("FAILED! " + str(exc.args))
+        return
+
     if resp[0]:
         update.message.reply_text("Your balance: " + str(resp[1]))
         logger.info("Balance of user " + username + ": " + str(resp[1]))

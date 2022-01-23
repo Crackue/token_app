@@ -47,8 +47,8 @@ class AccountsServicesImpl(AccountsServices):
     def __init__(self):
         self.repository = accounts_repository.repository
 
-    def add(self, username,  key: str) -> str:
-        return self.repository.add(username, key)
+    def add(self, key: str) -> str:
+        return self.repository.add(key)
 
     def at(self):
         # TODO

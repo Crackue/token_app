@@ -84,7 +84,7 @@ class TokenRepositoryImpl(TokenRepository):
                 logger.exception(exc)
                 return False, str(exc.args)
             logger.info(result.events)
-            return result
+            return True, True
         except Exception as exc:
             logger.exception(exc)
             return False, str(exc.args)

@@ -4,3 +4,4 @@ __pycache__
 hesis/
 .idea
 .env.dev
+venv

@@ -14,8 +14,7 @@ _service_ = accounts_services.service
 def add(request) -> HttpResponse:
     post = request.POST
     key = post["key"]
-    username = post["username"]
-    res = _service_.add(username, key)
+    res = _service_.add(key)
     return HttpResponse(res)
 
 

@@ -1,4 +1,5 @@
 import logging
+import json
 import requests
 from abc import abstractmethod
 from typing import Optional
@@ -68,26 +69,31 @@ class UserServicesRestImpl(UserServices):
         response = self.repository.signin(user)
         return response
 
-    def login(self, request) -> Optional[EtherUser]:
+    def login(self, request) -> tuple:
         post = request.POST
         username = post['username']
+        address_owner = post['address_owner']
         password = "" # json_['password']
         key = post['key']
-        obj = {"key": key, "username": username}
+        obj = {"key": key}
         try:
             response = requests.post(ether_accounts_add_endpoint, data=obj)
         except Exception as exc:
             logger.exception(exc)
-            return None
-
-        # TODO more info to log
+            res = False, str(exc.args)
+            return json.dumps(res)
         logger.info("Text: " + response.text + ", url: " + response.url)
         address = response.text
+
         if address is not None:
+            if not address == address_owner:
+                res = False, "This key no corresponds to user. Check your key."
+                return json.dumps(res)
             user = self.repository.login(request, username, password, address, True)
-            return user
+            res = True, user.to_json()
         else:
-            return None
+            res = False, "address for user: " + username + " not found. Probably should to be signed in"
+        return json.dumps(res)
 
     def logout(self, request):
         post = request.POST

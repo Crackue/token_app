@@ -96,7 +96,8 @@ class UserRepositoryImpl(UserRepository):
         try:
             user = EtherUser.objects.get(username=username)
             if user is not None:
-                return user.active_eth_address
+                addresses = user.eth_addresses
+                return addresses[0]
             else:
                 logger.warning("User " + username + " does not exist.")
                 return None

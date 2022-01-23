@@ -1,4 +1,5 @@
 import logging
+import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -11,23 +12,22 @@ _service_ = serviceRest
 @csrf_exempt
 def signin(request) -> HttpResponse:
     response = _service_.signin(request)
-    if response[0]:
-        request.session[response[1].username] = response[1]
     return HttpResponse(response[1])
 
 
 @csrf_exempt
 def login(request) -> HttpResponse:
-    user = _service_.login(request)
-    request.session[user.username] = user
-    return HttpResponse(True)
+    response = _service_.login(request)
+    resp = json.loads(response)
+    if resp[0]:
+        user = json.loads(resp[1])
+        request.session[user['username']] = user
+    return HttpResponse(response)
 
 
 @csrf_exempt
 def logout(request) -> HttpResponse:
     result = _service_.logout(request)
-    if not isinstance(result, bool):
-        request.session[result] = ""
     return HttpResponse(result)
 
 

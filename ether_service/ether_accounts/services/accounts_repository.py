@@ -53,7 +53,7 @@ class AccountsRepositoryImpl(AccountsRepository):
     def __init__(self):
         self.bch = bch_connection.bch_connection
 
-    def add(self, username, key: str) -> str:
+    def add(self, key: str) -> str:
         self.bch.connect()
         try:
             account = accounts.add(key)

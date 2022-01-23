@@ -1,9 +1,11 @@
 import logging
+import json
 import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from bot_service.settings import USER_SERVICE_HOST
 from urllib.parse import urlunsplit
+from utils import base_utils
 
 logger = logging.getLogger(__name__)
 # _user_service_ = serviceBot
@@ -46,26 +48,33 @@ def login(update: Update, context: CallbackContext):
 
 def get_key(update: Update, context: CallbackContext):
     username = update.message.from_user['username']
+    address_owner = base_utils.get_user_address_by_name(username)
+    if not address_owner[0]:
+        update.message.reply_text(address_owner[1])
+        return ConversationHandler.END
+
     key = update.message.text
-    obj = {"key": key, "username": username}
-    response = None
+    obj = {"key": key, "username": username, "address_owner": address_owner}
     try:
         response = requests.post(user_service_login_endpoint, data=obj)
     except Exception as exc:
         logger.exception(exc)
+        update.message.reply_text("Something goes wrong... " + str(exc.args) + ". Try again")
+        return ConversationHandler.END
+    resp = json.loads(response.text)
 
-    if response is None:
+    if resp is None:
         logger.info("Request post to " + user_service_login_endpoint + " FAILED")
         update.message.reply_text("Something wrong. Try again later")
         return ConversationHandler.END
 
-    if response.status_code == 200:
+    if resp[0]:
         logger.info("User " + str(username) + " logged in successfully")
         update.message.reply_text("Yep! You logged in!")
     else:
         # TODO add more info from response to log
         logger.info("User " + str(username) + " not exist")
-        update.message.reply_text("User " + str(username) + " not exist. You should signin")
+        update.message.reply_text("FAILED. " + resp[1])
     return ConversationHandler.END
 
 
@@ -118,12 +127,13 @@ def get_address(update: Update, context: CallbackContext):
     obj = {"eth_address": eth_address, "username": username}
     response = None
     try:
-        response = requests.post(user_service_logout_endpoint, data=obj)
+        response = requests.post(user_service_signin_endpoint, data=obj)
     except Exception as exc:
         logger.exception(exc)
+        return ConversationHandler.END
 
     if response is None:
-        logger.info("Request post to " + user_service_login_endpoint + " FAILED")
+        logger.info("Request post to " + user_service_signin_endpoint + " FAILED")
         update.message.reply_text("Something wrong. Try again later")
         return ConversationHandler.END
 
