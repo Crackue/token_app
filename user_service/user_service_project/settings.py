@@ -29,9 +29,9 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
-                 'user_service',
-                 'ether_service',
-                 'bot_service',
+                 'userservice',
+                 'etherservice',
+                 'botservice',
                  'gentle-peak-00425.herokuapp.com']
 
 

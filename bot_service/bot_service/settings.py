@@ -42,9 +42,9 @@ WEB_HOOK_URL = WEB_HOOK.replace('https://', '', 1)
 ALLOWED_HOSTS = ['localhost',
                  WEB_HOOK_URL,
                  '127.0.0.1',
-                 'user_service',
-                 'ether_service',
-                 'bot_service',
+                 'userservice',
+                 'etherservice',
+                 'botservice',
                  'limitless-atoll-51647.herokuapp.com']
 
 
