@@ -40,7 +40,12 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'user_service', 'ether_service', 'bot_service', '*', ]
+ALLOWED_HOSTS = ['localhost',
+                 '127.0.0.1',
+                 'user_service',
+                 'ether_service',
+                 'bot_service',
+                 'limitless-atoll-51647.herokuapp.com']
 
 
 # Application definition

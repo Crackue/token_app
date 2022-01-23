@@ -39,7 +39,13 @@ DEBUG = env('DEBUG')
 
 WEB_HOOK = env('WEB_HOOK_URL')
 WEB_HOOK_URL = WEB_HOOK.replace('https://', '', 1)
-ALLOWED_HOSTS = ['localhost', WEB_HOOK_URL, '127.0.0.1', 'user_service', 'ether_service', 'bot_service', '*', ]
+ALLOWED_HOSTS = ['localhost',
+                 WEB_HOOK_URL,
+                 '127.0.0.1',
+                 'user_service',
+                 'ether_service',
+                 'bot_service',
+                 'limitless-atoll-51647.herokuapp.com']
 
 
 # Application definition
