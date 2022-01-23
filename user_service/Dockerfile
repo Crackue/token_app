@@ -1,5 +1,4 @@
 FROM python:3.9-buster
-
 ARG DB_NAME
 ARG DB_NAME
 ARG DB_USER

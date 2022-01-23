@@ -13,7 +13,6 @@ build:
     ERC20_OWNER_ADDRESS=0xACF72d0962684c31F38559a896D636A00847cB89
     SOLCX_BINARY_PATH=/ttoken
     VVM_BINARY_PATH=/ttoken
-
     DB_NAME=tiktoken_db
     DB_USER=crackue
     DB_PASSWORD=sergij123
