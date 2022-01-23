@@ -6,6 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, Conve
 from utils.base_utils import amount_validate
 from bot_service.settings import ETHER_SERVICE_HOST
 from urllib.parse import urlunsplit
+from utils import base_utils
 
 logger = logging.getLogger(__name__)
 
@@ -36,14 +37,24 @@ def get_recipient_name(update: Update, context: CallbackContext):
 
 def get_value(update: Update, context: CallbackContext):
     amount = update.message['text']
-    res = amount_validate(amount)
-    if isinstance(res, str):
-        update.message.reply_text(res + ". Try again")
+    value = amount_validate(amount)
+    if isinstance(value, str):
+        update.message.reply_text(value + ". Try again")
         return VALUE
-    name_recipient = dto['name_recipient']
-    username = update.message.from_user['username']
 
-    obj = {"msg_owner": username, "name_recipient": name_recipient, "value": res}
+    name_recipient = dto['name_recipient']
+    address_to = base_utils.get_user_address_by_name(name_recipient)
+    if not address_to[0]:
+        update.message.reply_text(address_to[1])
+        return ConversationHandler.END
+
+    username = update.message.from_user['username']
+    is_logged_in = base_utils.is_logged_in(username)
+    if not is_logged_in[0]:
+        update.message.reply_text(is_logged_in[1])
+        return ConversationHandler.END
+
+    obj = {"address_owner": is_logged_in[1], "address_to": address_to[1], "value": value}
     try:
         response = requests.post(ether_erc20_transfer_endpoint, data=obj)
     except Exception as exc:

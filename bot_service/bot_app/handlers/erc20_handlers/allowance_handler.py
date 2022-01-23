@@ -1,13 +1,13 @@
 import logging
+import json
 import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from bot_service.settings import ETHER_SERVICE_HOST
 from urllib.parse import urlunsplit
+from utils import base_utils
 
 logger = logging.getLogger(__name__)
-# _erc20_service_ = serviceBot
-_erc20_service_ = 0
 
 SCHEME = "http"
 PORT = "8001"
@@ -36,17 +36,29 @@ def get_owner_name_allowance(update: Update, context: CallbackContext):
 
 def get_spender_name_allowance(update: Update, context: CallbackContext):
     spender_name = update.message['text']
-    owner_name = dto['owner_name']
+    address_spender = base_utils.get_user_address_by_name(spender_name)
+    if not address_spender[0]:
+        update.message.reply_text(address_spender[1])
+        return ConversationHandler.END
 
-    obj = {"owner_name": owner_name, "spender_name": spender_name}
-    response = None
+    owner_name = dto['owner_name']
+    address_owner = base_utils.get_user_address_by_name(owner_name)
+    if not address_owner[0]:
+        update.message.reply_text(address_owner[1])
+        return ConversationHandler.END
+
+    obj = {"address_owner": address_owner[1], "address_spender": address_spender[1]}
     try:
         response = requests.post(ether_erc20_allowance_endpoint, data=obj)
     except Exception as exc:
         logger.exception(exc)
-
-    _allowance_ = _erc20_service_.allowance(owner_name, spender_name)
-    update.message.reply_text("Allowance: " + str(_allowance_))
+        update.message.reply_text("FAILED: " + str(exc.args))
+        return ConversationHandler.END
+    resp = json.loads(response.text)
+    if resp[0]:
+        update.message.reply_text("Allowance: " + str(resp[1]))
+    else:
+        update.message.reply_text("FAILED: " + resp[1])
     return ConversationHandler.END
 
 

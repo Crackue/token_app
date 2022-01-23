@@ -1,6 +1,7 @@
 import json
 import logging
 import requests
+from utils import base_utils
 from telegram import Update
 from telegram.ext import CallbackContext
 from urllib.parse import urlunsplit
@@ -62,32 +63,14 @@ ether_erc20_allowance_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_allowanc
 
 def balance_of(update: Update, context: CallbackContext):
     username = update.message.from_user['username']
-    obj = {"username": username}
-    try:
-        user_address = requests.post(user_service_get_by_name_endpoint, data=obj)
-        if user_address.text is None:
-            update.message.reply_text("User does not exist. Probably, you should to sign in")
-            return
-    except Exception as exc:
-        logger.exception(exc)
-        update.message.reply_text("Something wrong: " + str(exc.args))
-        return
-
-    obj_address = {"user_address": user_address}
-    try:
-        response = requests.post(user_service_is_logged_in_endpoint, data=obj_address)
-        is_logged_in = response.text == 'True'
-        if not is_logged_in:
-            update.message.reply_text("You should be logged in for this stuff")
-            return
-    except Exception as exc:
-        logger.exception(exc)
-        update.message.reply_text("Something wrong: " + exc.args)
+    is_logged_in = base_utils.is_logged_in(username)
+    if not is_logged_in[0]:
+        update.message.reply_text(is_logged_in[1])
         return
 
     response = None
     try:
-        response = requests.post(ether_erc20_balance_of_endpoint, data=obj_address)
+        response = requests.post(ether_erc20_balance_of_endpoint, data=is_logged_in[1])
     except Exception as exc:
         logger.exception(exc)
     resp = json.loads(response.text)

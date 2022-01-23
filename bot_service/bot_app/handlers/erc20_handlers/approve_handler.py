@@ -1,13 +1,24 @@
 import logging
-
+import json
+import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from utils.base_utils import amount_validate
-# from erc20.services.service import serviceBot
+from bot_service.settings import ETHER_SERVICE_HOST
+from urllib.parse import urlunsplit
+from utils import base_utils
 
 logger = logging.getLogger(__name__)
-# _erc20_service_ = serviceBot
-_erc20_service_ = 0
+
+SCHEME = "http"
+PORT = "8001"
+NETLOC = ETHER_SERVICE_HOST + ":" + PORT
+
+ether_erc20_base = "erc20/"
+ether_erc20_approve = "approve/"
+path_approve = ether_erc20_base + ether_erc20_approve
+ether_erc20_approve_endpoint = urlunsplit((SCHEME, NETLOC, path_approve, "", ""))
+
 RECIPIENT_NAME, VALUE = range(2)
 dto = {}
 
@@ -25,18 +36,37 @@ def get_recipient_name(update: Update, context: CallbackContext):
 
 
 def get_value(update: Update, context: CallbackContext):
-    message = update.message
     amount = update.message['text']
-    res = amount_validate(amount)
-    if res is not None:
-        update.message.reply_text(res + ". Try again")
+    value = amount_validate(amount)
+    if isinstance(value, str):
+        update.message.reply_text(value + ". Try again")
         return VALUE
+
     name_recipient = dto['name_recipient']
-    response = _erc20_service_.approve(message, name_recipient, amount)
-    if response[0]:
+    address_to = base_utils.get_user_address_by_name(name_recipient)
+    if not address_to[0]:
+        update.message.reply_text(address_to[1])
+        return ConversationHandler.END
+
+    username = update.message.from_user['username']
+    is_logged_in = base_utils.is_logged_in(username)
+    if not is_logged_in[0]:
+        update.message.reply_text(is_logged_in[1])
+        return ConversationHandler.END
+
+    obj = {"address_owner": is_logged_in[1], "address_spender": address_to[1], "value": value}
+    try:
+        response = requests.post(ether_erc20_approve_endpoint, data=obj)
+    except Exception as exc:
+        logger.exception(exc)
+        update.message.reply_text("Something goes wrong... Try again")
+        return ConversationHandler.END
+
+    resp = json.loads(response.text)
+    if resp[0]:
         update.message.reply_text("Done!")
     else:
-        update.message.reply_text("FAILED! " + response[1])
+        update.message.reply_text("FAILED! " + resp[1])
     return ConversationHandler.END
 
 

@@ -47,77 +47,76 @@ class TokenRepositoryImpl(TokenRepository):
             logger.exception(exc)
             return False, str(exc.args)
 
-    def transfer(self, user, address_to, _value) -> tuple:
+    def transfer(self, address_owner, address_to, _value) -> tuple:
         logger.debug("start transfer()")
         try:
-            user_address = user.active_eth_address
-            if accounts.__contains__(user_address):
-                account = accounts.at(user_address)
+            if accounts.__contains__(address_owner):
+                account = accounts.at(address_owner)
             else:
-                logger.warning("There is no address" + str(user_address) + " in ContainerAccounts")
-                return False, "User " + str(user.username) + " not logged in"
-            # TODO add try except in case of not logged in
+                logger.warning("There is no address" + str(address_owner) + " in ContainerAccounts")
+                return False, "User " + str(address_owner) + " not logged in"
             tx = self._contract_.transfer(address_to, _value, {'from': account})
             transaction = transaction_utils.transaction_receipt_handler(tx)
             try:
                 transaction.save()
             except Exception as exc:
                 logger.exception(exc)
+                return False, str(exc.args)
             logger.info(tx.events)
             return True, True
         except Exception as exc:
             logger.exception(exc)
             return False, str(exc.args)
 
-    def transfer_from(self, user, address_from, address_to, _value) -> bool:
+    def transfer_from(self, address_owner, address_from, address_to, _value) -> tuple:
         logger.debug("start transfer_from()")
         try:
-            user_address = user.active_eth_address
-            if accounts.__contains__(user_address):
-                account = accounts.at(user_address)
+            if accounts.__contains__(address_owner):
+                account = accounts.at(address_owner)
             else:
-                logger.warning("There is no address" + user_address + " in ContainerAccounts")
-                return False
+                logger.warning("There is no address " + address_owner + " in ContainerAccounts")
+                return False, "There is no address " + address_owner + " in ContainerAccounts"
             result = self._contract_.transferFrom(address_from, address_to, _value, {'from': account})
             transaction = transaction_utils.transaction_receipt_handler(result)
             try:
                 transaction.save()
             except Exception as exc:
                 logger.exception(exc)
+                return False, str(exc.args)
             logger.info(result.events)
             return result
         except Exception as exc:
             logger.exception(exc)
-            return False
+            return False, str(exc.args)
 
-    def approve(self, user, address_spender, _value) -> tuple:
+    def approve(self, address_owner, address_spender, _value) -> tuple:
         try:
-            user_address = user.active_eth_address
-            if accounts.__contains__(user_address):
-                account = accounts.at(user_address)
+            if accounts.__contains__(address_owner):
+                account = accounts.at(address_owner)
             else:
-                logger.warning("There is no address" + user_address + " in ContainerAccounts")
-                return False, "User " + str(user.username) + " not logged in"
+                logger.warning("There is no address" + address_owner + " in ContainerAccounts")
+                return False, "Address " + str(address_owner) + " not logged in"
             approve = self._contract_.approve(address_spender, _value, {'from': account})
             transaction = transaction_utils.transaction_receipt_handler(approve)
             try:
                 transaction.save()
             except Exception as exc:
                 logger.exception(exc)
+                return False, str(exc.args)
             logger.info(approve.events)
-            return True, approve
+            return True, approve.status
         except Exception as exc:
             logger.info(accounts.__dict__)
             logger.exception(exc)
             return False, str(exc.args)
 
-    def allowance(self, address_owner, address_spender) -> int:
+    def allowance(self, address_owner, address_spender) -> tuple:
         try:
-            # TODO tuple
             allowance = self._contract_.allowance(address_owner, address_spender)
-            return allowance
+            return True, allowance
         except Exception as exc:
             logger.exception(exc)
+            return False, str(exc.args)
 
 
 repository = TokenRepositoryImpl()

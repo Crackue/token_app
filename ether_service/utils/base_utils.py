@@ -5,10 +5,12 @@ logger = logging.getLogger(__name__)
 
 
 def get_num_with_decimals(amount, decimals) -> int:
-    return amount * pow(10, decimals)
+    value = int(amount)
+    return value * pow(10, decimals)
 
 
 def num_without_decimals(amount, decimals) -> int:
+    value = int(amount)
     return amount / pow(10, decimals)
 
 
