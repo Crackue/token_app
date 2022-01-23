@@ -1,3 +1,6 @@
+setup:
+  config:
+    env_file: .env.dev
 build:
   docker:
     botserver: bot_service/Dockerfile
