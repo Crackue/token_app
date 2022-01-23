@@ -1,0 +1,9 @@
+build:
+  docker:
+    botserver: bot_server/Dockerfile
+    etherserver: ether_server/Dockerfile
+    userserver: user_server/Dockerfile
+run:
+  botserver: runserver 0.0.0.0:8002
+  etherserver: runserver 0.0.0.0:8001
+  userserver: runserver 0.0.0.0:8000
