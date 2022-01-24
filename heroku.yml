@@ -1,29 +1,29 @@
-setup:
-  config:
-    env_file: .env.dev
+#setup:
+#  config:
+#    env_file: .env.dev
 build:
   docker:
     botserver: bot_service/Dockerfile
     etherserver: ether_service/Dockerfile
     userserver: user_service/Dockerfile
-  config:
-    SECRET_KEY: ruk5yikh=#+jf+ko9w+s-*4$hoi0x_um_860^q!8v^h#=8v2=v
-
-    WEB3_INFURA_PROJECT_ID: 2b467672cb58452db53236fc882a31f3
-    DEFAULT_NETWORK: ropsten
-    ERC20_CONTRACT_ADDRESS: 0x9ee553B57ab8Ca0360D816aE420eE04cbD05b804
-    ERC20_CONTRACT_NAME: ERC20token
-    ERC20_OWNER_ADDRESS: 0xACF72d0962684c31F38559a896D636A00847cB89
-    SOLCX_BINARY_PATH: /ttoken
-    VVM_BINARY_PATH: /ttoken
-    DB_NAME: tiktoken_db
-    DB_USER: crackue
-    DB_PASSWORD: sergij123
-    DB_HOST: mongodb+srv://cluster0.ky4s7.mongodb.net
-
-    BOT_TOKEN: 5031034308:AAFWkzLv6NIjlwLbWRldFgCLGXnZvBC4oIk
-    TELEGRAM_URL: https://api.telegram.org/bot
-    WEB_HOOK_URL: https://gentle-peak-00425.herokuapp.com
+#  config:
+#    SECRET_KEY: ruk5yikh=#+jf+ko9w+s-*4$hoi0x_um_860^q!8v^h#=8v2=v
+#
+#    WEB3_INFURA_PROJECT_ID: 2b467672cb58452db53236fc882a31f3
+#    DEFAULT_NETWORK: ropsten
+#    ERC20_CONTRACT_ADDRESS: 0x9ee553B57ab8Ca0360D816aE420eE04cbD05b804
+#    ERC20_CONTRACT_NAME: ERC20token
+#    ERC20_OWNER_ADDRESS: 0xACF72d0962684c31F38559a896D636A00847cB89
+#    SOLCX_BINARY_PATH: /ttoken
+#    VVM_BINARY_PATH: /ttoken
+#    DB_NAME: tiktoken_db
+#    DB_USER: crackue
+#    DB_PASSWORD: sergij123
+#    DB_HOST: mongodb+srv://cluster0.ky4s7.mongodb.net
+#
+#    BOT_TOKEN: 5031034308:AAFWkzLv6NIjlwLbWRldFgCLGXnZvBC4oIk
+#    TELEGRAM_URL: https://api.telegram.org/bot
+#    WEB_HOOK_URL: https://gentle-peak-00425.herokuapp.com
 run:
   botserver: gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
   etherserver: gunicorn ether_service.wsgi:application --bind 0.0.0.0:8001

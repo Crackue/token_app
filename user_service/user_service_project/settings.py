@@ -1,6 +1,6 @@
 
 import os
-
+import django_heroku
 from environ import Env
 from mongoengine import connect
 
