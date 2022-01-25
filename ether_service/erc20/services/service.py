@@ -33,7 +33,7 @@ class TokenServiceImpl(TokenService):
         return _total_supply_
 
     def balance_of(self, request) -> tuple:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         user_address = post['user_address']
         _balance_of_ = self.repository.balance_of(user_address)
         # TODO 18 hardcode
@@ -44,7 +44,7 @@ class TokenServiceImpl(TokenService):
             return json.dumps(_balance_of_)
 
     def transfer(self, request) -> tuple:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         address_to = post["address_to"]
         _value_ = post["value"]
         address_owner = post["address_owner"]
@@ -54,7 +54,7 @@ class TokenServiceImpl(TokenService):
         return json.dumps(_transfer_)
 
     def transfer_from(self, request, address_from=None, address_to=None, value=None) -> bool:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         address_from = post["address_from"]
         address_to = post["address_to"]
         value = post["value"]
@@ -65,7 +65,7 @@ class TokenServiceImpl(TokenService):
         return json.dumps(_transfer_from_)
 
     def approve(self, request) -> bool:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         address_spender = post["address_spender"]
         value = post["value"]
         # TODO 18 hardcode
@@ -75,7 +75,7 @@ class TokenServiceImpl(TokenService):
         return json.dumps(_approve_)
 
     def allowance(self, request) -> tuple:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
         address_spender = post["address_spender"]
         _allowance_ = self.repository.allowance(address_owner, address_spender)

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-
+import json
 from ether_accounts.services import accounts_repository
 
 
@@ -48,7 +48,7 @@ class AccountsServicesImpl(AccountsServices):
         self.repository = accounts_repository.repository
 
     def add(self, request) -> str:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         key = post["key"]
         return self.repository.add(key)
 
@@ -80,7 +80,7 @@ class AccountsServicesImpl(AccountsServices):
         return res
 
     def is_local_account(self, request) -> bool:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         user_address = post['user_address']
         res = self.repository.is_local_account(request, user_address)
         return res

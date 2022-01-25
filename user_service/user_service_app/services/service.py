@@ -1,6 +1,6 @@
 import logging
 import json
-import requests
+import requests as http_requests
 from abc import abstractmethod
 from typing import Optional
 from user_service_app.models import EtherUser
@@ -55,7 +55,7 @@ class UserServicesRestImpl(UserServices):
         self.repository = repository
 
     def signin(self, request) -> tuple:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
         eth_address = post['eth_address']
         eth_addresses_list = [eth_address]
@@ -70,14 +70,14 @@ class UserServicesRestImpl(UserServices):
         return response
 
     def login(self, request) -> tuple:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
         address_owner = post['address_owner']
         password = "" # json_['password']
         key = post['key']
         obj = {"key": key}
         try:
-            response = requests.post(ether_accounts_add_endpoint, data=obj)
+            response = http_requests.post(ether_accounts_add_endpoint, data=obj)
         except Exception as exc:
             logger.exception(exc)
             res = False, str(exc.args)
@@ -96,13 +96,13 @@ class UserServicesRestImpl(UserServices):
         return json.dumps(res)
 
     def logout(self, request):
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
         user_address = self.repository.logout(username)
         if user_address is not None:
             response = None
             try:
-                response = requests.get(ether_accounts_remove_endpoint + user_address)
+                response = http_requests.get(ether_accounts_remove_endpoint + user_address)
             except Exception as exc:
                 logger.exception(exc)
             if response:
@@ -114,11 +114,11 @@ class UserServicesRestImpl(UserServices):
         return False
 
     def is_logged_in(self, request) -> bool:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         user_address = post['user_address']
         obj = {"user_address": user_address}
         try:
-            response = requests.post(ether_accounts_is_local_account_endpoint, data=obj)
+            response = http_requests.post(ether_accounts_is_local_account_endpoint, data=obj)
             ether_response = response.text == 'True'
         except Exception as exc:
             logger.exception(exc)
@@ -128,7 +128,7 @@ class UserServicesRestImpl(UserServices):
         return True if ether_response and db_response else False
 
     def get_user_address_by_name(self, request) -> str:
-        post = request.POST
+        post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
         user_address = self.repository.get_user_address_by_name(request, username)
         return user_address
