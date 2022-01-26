@@ -3,9 +3,9 @@
 #    env_file: .env.dev
 build:
   docker:
-    botserver: bot_service/Dockerfile
-    etherserver: ether_service/Dockerfile
-    userserver: user_service/Dockerfile
+    botservice: bot_service/Dockerfile.etherservice
+    etherservice: ether_service/Dockerfile.etherservice
+    userservice: user_service/Dockerfile.userservice
 #  config:
 #    SECRET_KEY: ruk5yikh=#+jf+ko9w+s-*4$hoi0x_um_860^q!8v^h#=8v2=v
 #
