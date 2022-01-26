@@ -21,4 +21,4 @@ RUN pip3 install --upgrade pip
 RUN pip3 install eth-brownie
 RUN pip3 install -r requirements.txt
 COPY . $APP_HOME
-
+CMD gunicorn ether_service.wsgi:application --bind 0.0.0.0:8001
