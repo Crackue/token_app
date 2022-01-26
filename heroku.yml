@@ -26,6 +26,6 @@ build:
 #    TELEGRAM_URL: https://api.telegram.org/bot
 #    WEB_HOOK_URL: https://gentle-peak-00425.herokuapp.com
 run:
-  botserver: gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
-  etherserver: gunicorn ether_service.wsgi:application --bind 0.0.0.0:8001
-  userserver: gunicorn user_service_project.wsgi:application --bind 0.0.0.0:8000
+  botservice: gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
+  etherservice: gunicorn ether_service.wsgi:application --bind 0.0.0.0:8001
+  userservice: gunicorn user_service_project.wsgi:application --bind 0.0.0.0:8000
