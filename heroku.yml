@@ -3,7 +3,7 @@
 #    env_file: .env.dev
 build:
   docker:
-    botservice: bot_service/Dockerfile.etherservice
+    botservice: bot_service/Dockerfile.botservice
     etherservice: ether_service/Dockerfile.etherservice
     userservice: user_service/Dockerfile.userservice
 #  config:
