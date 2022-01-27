@@ -5,7 +5,9 @@ services:
   botservice:
     image: bot_service:1.0
     container_name: bot-service
-    build: ./bot_service
+    build:
+      context: ./bot_service
+      dockerfile: Dockerfile.botservice
     command: gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
     env_file: .env.dev
     ports:
@@ -16,7 +18,9 @@ services:
   etherservice:
     image: ether_service:1.0
     container_name: ether-service
-    build: ./ether_service
+    build:
+      context: ./ether_service
+      dockerfile: Dockerfile.etherservice
     depends_on:
       - botservice
     command: gunicorn ether_service.wsgi:application --bind 0.0.0.0:8001
@@ -29,7 +33,9 @@ services:
   userservice:
     image: user_service:1.0
     container_name: user-service
-    build: ./user_service
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile.userservice
     depends_on:
       - botservice
     command: gunicorn user_service_project.wsgi:application --bind 0.0.0.0:8000
