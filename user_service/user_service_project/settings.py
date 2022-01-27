@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['localhost',
                  'userservice',
                  'etherservice',
                  'botservice',
-                 'gentle-peak-00425.herokuapp.com']
+                 'fathomless-wave-83810.herokuapp.com']
 
 
 # Application definition
