@@ -68,9 +68,9 @@ t.start()
 
 @csrf_exempt
 def start_bot(request) -> HttpResponse:
-    logger.info(request)
+    logger.info("START_BOT_REQUEST")
     # t.start()
-    return HttpResponse(True)
+    return HttpResponse("START_BOT_RESPONSE")
 
 
 class TelegramBotWebhookView(View):

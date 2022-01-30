@@ -8,8 +8,6 @@ from urllib.parse import urlunsplit
 from utils import base_utils
 
 logger = logging.getLogger(__name__)
-# _user_service_ = serviceBot
-_user_service_ = 0
 
 KEY, WALLET_ADDRESS = range(2)
 
