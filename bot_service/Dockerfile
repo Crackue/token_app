@@ -15,4 +15,4 @@ RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade certifi
 RUN pip3 install -r requirements.txt
 COPY . $APP_HOME
-CMD gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
+CMD gunicorn bot_service.wsgi:application --bind 0.0.0.0:$PORT
