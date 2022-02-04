@@ -5,8 +5,8 @@ from utils import base_utils
 from telegram import Update
 from telegram.ext import CallbackContext
 from urllib.parse import urlunsplit
-from bot_service.settings import ETHER_SERVICE_HOST
-from bot_service.settings import USER_SERVICE_HOST
+from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
+from bot_service.settings import USER_SERVICE_HOST, USER_PORT
 
 
 dto = {}
@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 # _erc20_service_ = serviceBot
 _erc20_service_ = 0
 
-SCHEME = "http"
 
-USER_PORT = "8000"
 USER_NETLOC = USER_SERVICE_HOST + ":" + USER_PORT
 user_service_base = "user/"
 user_service_is_logged_in = "is_logged_in/"
@@ -27,7 +25,6 @@ path_get_by_name = user_service_base + user_service_get_by_name
 user_service_is_logged_in_endpoint = urlunsplit((SCHEME, USER_NETLOC, path_is_logged_in, "", ""))
 user_service_get_by_name_endpoint = urlunsplit((SCHEME, USER_NETLOC, path_get_by_name, "", ""))
 
-ETHER_PORT = "8001"
 ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT
 ether_erc20_base = "erc20/"
 ether_erc20_name = "name/"

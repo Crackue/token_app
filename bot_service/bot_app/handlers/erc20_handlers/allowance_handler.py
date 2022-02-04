@@ -3,15 +3,13 @@ import json
 import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
-from bot_service.settings import ETHER_SERVICE_HOST
+from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
 from urllib.parse import urlunsplit
 from utils import base_utils
 
 logger = logging.getLogger(__name__)
 
-SCHEME = "http"
-PORT = "8001"
-NETLOC = ETHER_SERVICE_HOST + ":" + PORT
+NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT
 
 ether_erc20_base = "erc20/"
 ether_erc20_allowance = "allowance/"

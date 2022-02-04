@@ -15,9 +15,7 @@ from mongoengine import connect
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = Env(
-    DEBUG=(bool, False)
-)
+env = Env(DEBUG=(bool, False))
 
 BASE_DIR = root
 
@@ -25,14 +23,17 @@ BASE_DIR = root
 ENV_PATH = env.str('ENV_PATH')
 env.read_env(BASE_DIR + "/" + ENV_PATH)
 
-ETHER_SERVICE_HOST = env.str('ETHER_SERVICE_HOST')
-USER_SERVICE_HOST = env.str('USER_SERVICE_HOST')
+ETHER_SERVICE_HOST = env('ETHER_SERVICE_HOST')
+ETHER_PORT = env('ETHER_PORT')
+USER_SERVICE_HOST = env('USER_SERVICE_HOST')
+USER_PORT = env('USER_PORT')
+SCHEME = env('SCHEME')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', default='foo')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')

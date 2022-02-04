@@ -3,7 +3,7 @@ import json
 import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
-from bot_service.settings import USER_SERVICE_HOST
+from bot_service.settings import USER_SERVICE_HOST, USER_PORT, SCHEME
 from urllib.parse import urlunsplit
 from utils import base_utils
 
@@ -11,9 +11,7 @@ logger = logging.getLogger(__name__)
 
 KEY, WALLET_ADDRESS = range(2)
 
-SCHEME = "http"
-PORT = "8000"
-NETLOC = USER_SERVICE_HOST + ":" + PORT
+NETLOC = USER_SERVICE_HOST + ":" + USER_PORT if SCHEME == "http" else USER_SERVICE_HOST
 
 user_service_base = "user/"
 user_service_login = "login/"
