@@ -32,7 +32,7 @@ USER_SERVICE_HOST = env.str('USER_SERVICE_HOST')
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', default='foo')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
@@ -42,10 +42,8 @@ WEB_HOOK_URL = WEB_HOOK.replace('https://', '', 1)
 ALLOWED_HOSTS = ['localhost',
                  WEB_HOOK_URL,
                  '127.0.0.1',
-                 'userservice',
-                 'etherservice',
                  'botservice',
-                 'fathomless-wave-83810.herokuapp.com']
+                 'shrouded-shore-63902.herokuapp.com']
 
 
 # Application definition
@@ -175,4 +173,4 @@ CACHES = {
 }
 
 BOT_TOKEN = env('BOT_TOKEN')
-WEB_HOOK_URL=env('WEB_HOOK_URL')
+WEB_HOOK_URL = env('WEB_HOOK_URL')

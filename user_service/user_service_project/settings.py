@@ -29,9 +29,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
                  'userservice',
-                 'etherservice',
-                 'botservice',
-                 'fathomless-wave-83810.herokuapp.com']
+                 'rocky-stream-04103.herokuapp.com']
 
 
 # Application definition
