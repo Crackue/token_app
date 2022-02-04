@@ -10,8 +10,8 @@ from urllib.parse import urlunsplit
 
 logger = logging.getLogger(__name__)
 SCHEME = "http"
-PORT = "8001"
-NETLOC = ETHER_SERVICE_HOST + ":" + PORT
+ETHER_PORT = "8001"
+NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT
 
 ether_accounts_base = "accounts/"
 ether_accounts_add = "add/"
