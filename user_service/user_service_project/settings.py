@@ -29,8 +29,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
                  'userservice',
-                 'rocky-stream-04103.herokuapp.com']
-
+                 'thawing-harbor-07479.herokuapp.com']
 
 # Application definition
 
