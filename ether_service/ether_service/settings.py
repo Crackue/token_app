@@ -42,10 +42,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
-                 'userservice',
                  'etherservice',
-                 'botservice',
-                 'fathomless-wave-83810.herokuapp.com']
+                 'afternoon-sierra-39285.herokuapp.com']
 
 
 # Application definition
