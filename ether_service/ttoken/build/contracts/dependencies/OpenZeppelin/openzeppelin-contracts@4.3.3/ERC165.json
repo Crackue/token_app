@@ -77,6 +77,7 @@
             "src": "688:7:12"
           }
         ],
+        "canonicalName": "ERC165",
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
@@ -314,7 +315,7 @@
       "enabled": true,
       "runs": 200
     },
-    "version": "0.8.7+commit.e28d00a7"
+    "version": "0.8.11+commit.d7f03943"
   },
   "contractName": "ERC165",
   "coverageMap": {

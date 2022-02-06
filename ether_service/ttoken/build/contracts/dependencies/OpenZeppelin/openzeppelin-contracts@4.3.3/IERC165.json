@@ -48,6 +48,7 @@
       {
         "abstract": false,
         "baseContracts": [],
+        "canonicalName": "IERC165",
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
@@ -170,7 +171,7 @@
       "enabled": true,
       "runs": 200
     },
-    "version": "0.8.7+commit.e28d00a7"
+    "version": "0.8.11+commit.d7f03943"
   },
   "contractName": "IERC165",
   "coverageMap": {
