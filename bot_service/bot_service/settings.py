@@ -44,7 +44,7 @@ ALLOWED_HOSTS = ['localhost',
                  WEB_HOOK_URL,
                  '127.0.0.1',
                  'botservice',
-                 'shrouded-shore-63902.herokuapp.com']
+                 '.herokuapp.com']
 
 
 # Application definition

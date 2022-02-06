@@ -43,7 +43,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
                  'etherservice',
-                 'afternoon-sierra-39285.herokuapp.com']
+                 '.herokuapp.com']
 
 
 # Application definition
