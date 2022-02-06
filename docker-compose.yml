@@ -9,7 +9,7 @@ services:
       context: ./bot_service
       dockerfile: Dockerfile
     command: gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
-    env_file: .env.dev
+    env_file: .env.test
     ports:
       - "8002:8002"
     networks:
@@ -24,7 +24,7 @@ services:
     depends_on:
       - botservice
     command: gunicorn ether_service.wsgi:application --bind 0.0.0.0:8001
-    env_file: .env.dev
+    env_file: .env.test
     ports:
       - "8001:8001"
     networks:
@@ -39,7 +39,7 @@ services:
     depends_on:
       - botservice
     command: gunicorn user_service_project.wsgi:application --bind 0.0.0.0:8000
-    env_file: .env.dev
+    env_file: .env.test
     ports:
       - "8000:8000"
     networks:

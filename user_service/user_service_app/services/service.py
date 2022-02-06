@@ -2,16 +2,14 @@ import logging
 import json
 import requests as http_requests
 from abc import abstractmethod
-from typing import Optional
 from user_service_app.models import EtherUser
 from user_service_app.services.repository import repository
-from user_service_project.settings import ETHER_SERVICE_HOST
+from user_service_project.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
 from urllib.parse import urlunsplit
 
 logger = logging.getLogger(__name__)
-SCHEME = "http"
-ETHER_PORT = "8001"
-NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT
+
+NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT if SCHEME == "http" else ETHER_SERVICE_HOST
 
 ether_accounts_base = "accounts/"
 ether_accounts_add = "add/"

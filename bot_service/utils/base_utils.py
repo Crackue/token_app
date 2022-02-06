@@ -1,16 +1,13 @@
 import logging
 import sys
-import json
 import requests
-from bot_service.settings import USER_SERVICE_HOST
+from bot_service.settings import USER_SERVICE_HOST, USER_PORT, SCHEME
 from urllib.parse import urlunsplit
 
 logger = logging.getLogger(__name__)
 
-SCHEME = "http"
+USER_NETLOC = USER_SERVICE_HOST + ":" + USER_PORT if SCHEME == "http" else USER_SERVICE_HOST
 
-USER_PORT = "8000"
-USER_NETLOC = USER_SERVICE_HOST + ":" + USER_PORT
 user_service_base = "user/"
 user_service_is_logged_in = "is_logged_in/"
 user_service_get_by_name = "get_user_by_name/"

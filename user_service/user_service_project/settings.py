@@ -16,6 +16,8 @@ ENV_PATH = env.str('ENV_PATH')
 env.read_env(BASE_DIR + "/" + ENV_PATH)
 
 ETHER_SERVICE_HOST = env.str('ETHER_SERVICE_HOST')
+ETHER_PORT = env('ETHER_PORT')
+SCHEME = env('SCHEME')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
