@@ -10,12 +10,12 @@ from utils import base_utils
 
 logger = logging.getLogger(__name__)
 
-NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT
+ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT if SCHEME == "http" else ETHER_SERVICE_HOST
 
 ether_erc20_base = "erc20/"
 ether_erc20_transfer = "transfer/"
 path_transfer = ether_erc20_base + ether_erc20_transfer
-ether_erc20_transfer_endpoint = urlunsplit((SCHEME, NETLOC, path_transfer, "", ""))
+ether_erc20_transfer_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_transfer, "", ""))
 
 RECIPIENT_NAME, VALUE = range(2)
 dto = {}

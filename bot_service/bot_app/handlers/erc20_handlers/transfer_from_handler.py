@@ -10,7 +10,7 @@ from utils import base_utils
 
 logger = logging.getLogger(__name__)
 
-ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT
+ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT if SCHEME == "http" else ETHER_SERVICE_HOST
 
 ether_erc20_base = "erc20/"
 ether_erc20_transfer_from = "transfer_from/"
