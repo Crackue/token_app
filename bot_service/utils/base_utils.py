@@ -66,5 +66,5 @@ def get_user_address_by_name(username) -> tuple:
             return False, "User " + username + "does not exist"
         return True, user_address.text
     except Exception as exc:
-        logger.exception(exc)
+        logger.exception("For " + user_service_get_by_name_endpoint + " exaption: " + str(exc.args))
         return False, "Something wrong: " + str(exc.args)
