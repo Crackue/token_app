@@ -1,8 +1,10 @@
 import logging
 import json
 import requests
-from telegram import Update
+from telegram import Update, Bot
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
+
+from bot_app.models import TelegramMessage
 from utils.base_utils import amount_validate
 from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
 from urllib.parse import urlunsplit
@@ -61,6 +63,11 @@ def get_value(update: Update, context: CallbackContext):
         return ConversationHandler.END
     resp = json.loads(response.text)
     if resp[0]:
+        # TODO ADD sort by time and choose last message (in case of user update bot instance)
+        _message_ = TelegramMessage.objects.filter(message__chat__username=name_recipient)
+        if _message_:
+            chat_id = _message_.message.chat.id
+            Bot.send_message(chat_id, "Transaction from " + username + " was complete. Check your balance")
         update.message.reply_text("Done!")
     else:
         update.message.reply_text("FAILED: " + resp[1])

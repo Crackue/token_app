@@ -56,6 +56,7 @@ class TokenRepositoryImpl(TokenRepository):
                 logger.warning("There is no address" + str(address_owner) + " in ContainerAccounts")
                 return False, "User " + str(address_owner) + " not logged in"
             tx = self._contract_.transfer(address_to, _value, {'from': account})
+            # TODO tx.revert_msg for message error (exm: 'Insufficient Balance') or tx.trace
             transaction = transaction_utils.transaction_receipt_handler(tx)
             try:
                 transaction.save()

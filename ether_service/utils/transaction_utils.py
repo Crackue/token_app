@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 def transaction_receipt_handler(tx: TransactionReceipt) -> Transaction:
     transaction_model = Transaction()
+    # TODO add contract address
     transaction_model.contract_name = tx.contract_name
     transaction_model.fn_name = tx.fn_name
     transaction_model.txid = tx.txid

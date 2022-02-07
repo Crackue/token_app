@@ -4,9 +4,7 @@ from brownie import accounts
 from brownie.network.account import LocalAccount
 from ether_network import bch_connection
 
-
 logger = logging.getLogger(__name__)
-addr_wallet = "0xACF72d0962684c31F38559a896D636A00847cB89"
 
 
 class AccountsRepository:
