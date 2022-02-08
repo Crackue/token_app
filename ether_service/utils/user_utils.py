@@ -1,4 +1,4 @@
-from user_service.models import EtherUser
+from ether_accounts.models import EtherUser
 from mongoengine.errors import DoesNotExist
 
 

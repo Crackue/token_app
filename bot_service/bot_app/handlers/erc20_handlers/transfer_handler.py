@@ -1,7 +1,7 @@
 import logging
 import json
 import requests
-from telegram import Update, Bot
+from telegram import Update, Bot, Message
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 
 from bot_app.models import TelegramMessage
@@ -57,17 +57,19 @@ def get_value(update: Update, context: CallbackContext):
     obj = {"address_owner": is_logged_in[1], "address_to": address_to[1], "value": value}
     try:
         response = requests.post(ether_erc20_transfer_endpoint, data=obj)
+        resp = json.loads(response.text)
     except Exception as exc:
-        logger.exception(exc)
+        logger.exception("Endpoint: " + ether_erc20_transfer_endpoint + ". Error message: " + str(exc.args))
         update.message.reply_text("Something goes wrong... Try again")
         return ConversationHandler.END
-    resp = json.loads(response.text)
     if resp[0]:
         # TODO ADD sort by time and choose last message (in case of user update bot instance)
-        _message_ = TelegramMessage.objects.filter(message__chat__username=name_recipient)
-        if _message_:
-            chat_id = _message_.message.chat.id
-            Bot.send_message(chat_id, "Transaction from " + username + " was complete. Check your balance")
+        message_qset = TelegramMessage.objects.filter(message__chat__username=name_recipient)
+        message_obj = message_qset.order_by('date_modified').first()
+        if message_obj:
+            chat_id = message_obj['message']['chat']['id']
+            update.message.bot.send_message(chat_id=chat_id,
+                                            text="Transaction from " + username + " was complete. Check your balance")
         update.message.reply_text("Done!")
     else:
         update.message.reply_text("FAILED: " + resp[1])
