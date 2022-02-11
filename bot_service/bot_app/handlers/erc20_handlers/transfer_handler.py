@@ -30,7 +30,9 @@ def transfer(update: Update, context: CallbackContext):
 
 def get_recipient_name(update: Update, context: CallbackContext):
     name_recipient = update.message['text']
-    dto['name_recipient'] = name_recipient
+    dto['name_recipient'] = str(name_recipient).replace('@', '', 1) \
+        if str(name_recipient).startswith('@') \
+        else name_recipient
     update.message.reply_text("Enter token value:")
     return VALUE
 
@@ -63,9 +65,8 @@ def get_value(update: Update, context: CallbackContext):
         update.message.reply_text("Something goes wrong... Try again")
         return ConversationHandler.END
     if resp[0]:
-        # TODO ADD sort by time and choose last message (in case of user update bot instance)
-        message_qset = TelegramMessage.objects.filter(message__chat__username=name_recipient)
-        message_obj = message_qset.order_by('date_modified').first()
+        message_q_set = TelegramMessage.objects.filter(message__chat__username=name_recipient)
+        message_obj = message_q_set.order_by('date_modified').first()
         if message_obj:
             chat_id = message_obj['message']['chat']['id']
             update.message.bot.send_message(chat_id=chat_id,
@@ -78,7 +79,7 @@ def get_value(update: Update, context: CallbackContext):
 
 def repeat_or_stop(update: Update, context: CallbackContext):
     _text_ = update.message['text']
-    if _text_ == 'stop':
+    if str(_text_).lower() == 'stop':
         update.message.reply_text('Buy! See you later...')
         return ConversationHandler.END
     else:

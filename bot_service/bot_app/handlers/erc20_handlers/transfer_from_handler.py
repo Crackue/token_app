@@ -35,7 +35,9 @@ def get_sender_name(update: Update, context: CallbackContext):
 
 def get_recipient_name_tr_from(update: Update, context: CallbackContext):
     recipient_name = update.message['text']
-    dto['recipient_name'] = recipient_name
+    dto['name_recipient'] = str(recipient_name).replace('@', '', 1) \
+        if str(recipient_name).startswith('@') \
+        else recipient_name
     update.message.reply_text("How much?")
     return VALUE
 
@@ -82,7 +84,7 @@ def get_value_tr_from(update: Update, context: CallbackContext):
 
 def repeat_or_stop(update: Update, context: CallbackContext):
     _text_ = update.message['text']
-    if _text_ == 'stop':
+    if str(_text_).lower() == 'stop':
         update.message.reply_text('Buy! See you later...')
         return ConversationHandler.END
     else:

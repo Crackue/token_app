@@ -11,7 +11,7 @@ from bot_app.handlers.auth_handlers import auth_handlers as auth_handler
 from bot_app.handlers.erc20_handlers import (base_handlers, transfer_handler,
                                              approve_handler, allowance_handler,
                                              transfer_from_handler)
-from bot_app.bot_service import bot_request_utils as request_utils, handlers_utils as utils
+from utils import bot_request_utils as request_utils, handlers_utils as utils
 from telegram import Bot, Update
 import telegram.error
 from telegram.ext import (Updater, CommandHandler, Dispatcher)
@@ -58,7 +58,8 @@ def run_pooling():
     # updater.start_polling()
     bot_info = Bot(BOT_TOKEN).get_me()
     bot_link = f"https://t.me/" + bot_info["username"]
-    print(f"Pooling of '{bot_link}' started")
+    logger.info(bot.getWebhookInfo().to_json())
+    logger.info(f"Pooling of '{bot_link}' started")
 
 
 t = threading.Thread(name='bot', target=run_pooling)
@@ -78,8 +79,7 @@ class TelegramBotWebhookView(View):
     # Can be fixed with async celery task execution
     def post(self, request, *args, **kwargs):
         logger.info(request)
-        logger.debug("DEBUG " + str(DEBUG))
-        # TODO add load balanser
+        # TODO add load balancer
         process_telegram_event(json.loads(request.body))
 
         # if DEBUG:

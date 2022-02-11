@@ -28,7 +28,9 @@ def approve(update: Update, context: CallbackContext):
 
 def get_recipient_name(update: Update, context: CallbackContext):
     name_recipient = update.message['text']
-    dto['name_recipient'] = name_recipient
+    dto['name_recipient'] = str(name_recipient).replace('@', '', 1) \
+        if str(name_recipient).startswith('@') \
+        else name_recipient
     update.message.reply_text("How much?")
     return VALUE
 
@@ -70,7 +72,7 @@ def get_value(update: Update, context: CallbackContext):
 
 def repeat_or_stop(update: Update, context: CallbackContext):
     _text_ = update.message['text']
-    if _text_ == 'stop':
+    if str(_text_).lower() == 'stop':
         update.message.reply_text('Buy! See you later...')
         return ConversationHandler.END
     else:

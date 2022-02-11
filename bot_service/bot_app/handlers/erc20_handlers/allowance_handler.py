@@ -62,7 +62,7 @@ def get_spender_name_allowance(update: Update, context: CallbackContext):
 
 def repeat_or_stop(update: Update, context: CallbackContext):
     _text_ = update.message['text']
-    if _text_ == 'stop':
+    if str(_text_).lower() == 'stop':
         update.message.reply_text('Buy! See you later...')
         return ConversationHandler.END
     else:
