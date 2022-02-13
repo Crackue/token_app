@@ -69,7 +69,7 @@ def get_value(update: Update, context: CallbackContext):
         message_obj = message_q_set.order_by('date_modified').first()
         if message_obj:
             chat_id = message_obj['message']['chat']['id']
-            update.message.bot.send_message(chat_id=chat_id,
+            context.bot.send_message(chat_id=chat_id,
                                             text="Transaction from " + username + " was complete. Check your balance")
         update.message.reply_text("Done!")
     else:

@@ -21,7 +21,7 @@ ether_service - afternoon-sierra-39285.herokuapp.com
 5. Press import
 
 # bot commands:
-BOT NAME: GangBoyGame
+BOT NAME: @QyV5mwkcBot
 
 AUTH commands:\
 /signin - registration of wallet address (public key) in the bot\
