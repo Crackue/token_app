@@ -22,4 +22,5 @@ urlpatterns = [
     path('bch/', include('ether_network.urls')),
     path('accounts/', include('ether_accounts.urls')),
     path('erc20/', include('erc20.urls')),
+    path('contract/', include('contracts.urls')),
 ]

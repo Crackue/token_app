@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'ether_network.apps.NetworkConfig',
     'ether_accounts.apps.EtherAccountsConfig',
     'erc20.apps.Erc20Config',
+    'contracts.apps.ContractsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

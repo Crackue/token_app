@@ -46,6 +46,10 @@ class UserServices:
     def get_user_address_by_name(self, request) -> str:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_contracts_by_name(self, request) -> str:
+        raise NotImplementedError
+
 
 class UserServicesRestImpl(UserServices):
 
@@ -130,6 +134,12 @@ class UserServicesRestImpl(UserServices):
         username = post['username']
         user_address = self.repository.get_user_address_by_name(request, username)
         return user_address
+
+    def get_contracts_by_name(self, request) -> tuple:
+        post = request.POST if request.POST else json.loads(request.body)
+        username = post['username']
+        user_contracts = self.repository.get_user_contracts_by_name(request, username)
+        return user_contracts
 
 
 serviceRest = UserServicesRestImpl()

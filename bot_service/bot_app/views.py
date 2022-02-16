@@ -11,6 +11,9 @@ from bot_app.handlers.auth_handlers import auth_handlers as auth_handler
 from bot_app.handlers.erc20_handlers import (base_handlers, transfer_handler,
                                              approve_handler, allowance_handler,
                                              transfer_from_handler)
+from bot_app.handlers.main_menu_handlers import (on_start_menu_handler, my_contract_handler,
+                                                 on_create_contract_handler, on_interact_with_contract_handler)
+from bot_app.handlers.create_contract_handlers import erc20_handler
 from utils import bot_request_utils as request_utils, handlers_utils as utils
 from telegram import Bot, Update
 import telegram.error
@@ -32,16 +35,19 @@ except telegram.error.Unauthorized:
 
 
 def setup_dispatcher(dp):
-    dp.add_handler(CommandHandler("start", start_handler.command_start))
-    dp.add_handler(auth_handler.signin_conv_handler)
+    dp.add_handler(CommandHandler("start", on_start_menu_handler.command_start))
+    # dp.add_handler(auth_handler.signin_conv_handler)
     dp.add_handler(auth_handler.login_conv_handler)
     dp.add_handler(CommandHandler("logout", auth_handler.logout))
+    dp.add_handler(CommandHandler("my_contracts", my_contract_handler.get_contracts_command))
+    dp.add_handler(CommandHandler("create_contract", on_create_contract_handler.command_create_contract))
+    dp.add_handler(erc20_handler.erc20_conv_handler)
+    dp.add_handler(CommandHandler("interact_with_contract", on_interact_with_contract_handler.command_interact_with_contract))
     dp.add_handler(CommandHandler("balance", base_handlers.balance_of))
     dp.add_handler(transfer_handler.transfer_conv_handler)
     dp.add_handler(approve_handler.approve_conv_handler)
     dp.add_handler(allowance_handler.allowance_conv_handler)
     dp.add_handler(transfer_from_handler.transfer_from_conv_handler)
-    # dp.add_handler(MessageHandler(Filters.all, all_message_handler.handle_message))
     return dp
 
 

@@ -33,10 +33,10 @@ networks:
         host: https://ropsten.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
 
 compiler:
-    evm_version: null
+    evm_version: istanbul
     minify_source: false
     solc:
-        version: null
+        version: 0.8.7
         optimize: true
         runs: 200
 

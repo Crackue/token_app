@@ -41,3 +41,9 @@ def is_logged_in(request) -> HttpResponse:
 def get_user_address_by_name(request) -> HttpResponse:
     user_address = _service_.get_user_address_by_name(request)
     return HttpResponse(user_address)
+
+
+@csrf_exempt
+def get_contracts_by_name(request) -> HttpResponse:
+    user_contracts = _service_.get_contracts_by_name(request)
+    return HttpResponse(user_contracts)

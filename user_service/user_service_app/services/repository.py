@@ -28,6 +28,10 @@ class UserRepository:
     def get_user_address_by_name(self, request, username) -> str:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_user_contracts_by_name(self, request, username) -> tuple:
+        raise NotImplementedError
+
 
 class UserRepositoryImpl(UserRepository):
 
@@ -98,6 +102,19 @@ class UserRepositoryImpl(UserRepository):
             if user is not None:
                 addresses = user.eth_addresses
                 return addresses[0]
+            else:
+                logger.warning("User " + username + " does not exist.")
+                return None
+        except Exception as exc:
+            logger.warning("User " + username + " does not exist. " + str(exc))
+            return None
+
+    def get_user_contracts_by_name(self, request, username) -> tuple:
+        try:
+            user = EtherUser.objects.get(username=username)
+            if user is not None:
+                addresses = user.contract_addresses
+                return addresses
             else:
                 logger.warning("User " + username + " does not exist.")
                 return None
