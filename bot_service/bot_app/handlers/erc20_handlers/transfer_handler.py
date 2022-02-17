@@ -8,7 +8,7 @@ from bot_app.models import TelegramMessage
 from utils.base_utils import amount_validate
 from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
 from urllib.parse import urlunsplit
-from utils import base_utils
+from utils import base_utils, bot_request_utils
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +45,7 @@ def get_value(update: Update, context: CallbackContext):
         return VALUE
 
     name_recipient = dto['name_recipient']
+    member = bot_request_utils.is_chat_member(update, name_recipient)
     address_to = base_utils.get_user_address_by_name(name_recipient)
     if not address_to[0]:
         update.message.reply_text(address_to[1])
@@ -58,6 +59,7 @@ def get_value(update: Update, context: CallbackContext):
 
     obj = {"address_owner": is_logged_in[1], "address_to": address_to[1], "value": value}
     try:
+        logger.info(bot_request_utils.is_chat_member(context, name_recipient))
         response = requests.post(ether_erc20_transfer_endpoint, data=obj)
         resp = json.loads(response.text)
     except Exception as exc:
@@ -65,12 +67,13 @@ def get_value(update: Update, context: CallbackContext):
         update.message.reply_text("Something goes wrong... Try again")
         return ConversationHandler.END
     if resp[0]:
-        message_q_set = TelegramMessage.objects.filter(message__chat__username=name_recipient)
-        message_obj = message_q_set.order_by('date_modified').first()
-        if message_obj:
-            chat_id = message_obj['message']['chat']['id']
-            context.bot.send_message(chat_id=chat_id,
-                                            text="Transaction from " + username + " was complete. Check your balance")
+        # TODO implement sending notification to recipient
+        # message_q_set = TelegramMessage.objects.filter(message__chat__username=name_recipient)
+        # message_obj = message_q_set.order_by('date_modified').first()
+        # if message_obj:
+        #     chat_id = message_obj['message']['chat']['id']
+        #     context.bot.send_message(chat_id=chat_id,
+        #                                     text="Transaction from " + username + " was complete. Check your balance")
         update.message.reply_text("Done!")
     else:
         update.message.reply_text("FAILED: " + resp[1])
