@@ -58,6 +58,7 @@ def get_value(update: Update, context: CallbackContext):
 
     obj = {"address_owner": is_logged_in[1], "address_to": address_to[1], "value": value}
     try:
+        # TODO check if name_recipient in chat first
         response = requests.post(ether_erc20_transfer_endpoint, data=obj)
         resp = json.loads(response.text)
     except Exception as exc:
@@ -69,8 +70,12 @@ def get_value(update: Update, context: CallbackContext):
         message_obj = message_q_set.order_by('date_modified').first()
         if message_obj:
             chat_id = message_obj['message']['chat']['id']
-            context.bot.send_message(chat_id=chat_id,
-                                            text="Transaction from " + username + " was complete. Check your balance")
+            try:
+                context.bot.send_message(chat_id=chat_id,
+                                         text="Transaction from " + username + " was complete. Check your balance")
+            except Exception as exc:
+                update.message.reply_text("FAILED. " + str(exc.args))
+                return ConversationHandler.END
         update.message.reply_text("Done!")
     else:
         update.message.reply_text("FAILED: " + resp[1])

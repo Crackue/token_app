@@ -2,7 +2,8 @@ import logging
 import brownie
 from abc import abstractmethod
 from pathlib import Path
-from ether_service.settings import BASE_DIR
+from ether_service.settings import BASE_DIR, CONTRACT_HOME
+from brownie import project
 
 logger = logging.getLogger(__name__)
 
@@ -42,12 +43,14 @@ class BCHConnectionImpl(BCHConnection):
     def connect(self):
         try:
             if not brownie.network.is_connected():
-                brownie_config_path = Path(str(BASE_DIR) + "/ttoken")
+                brownie_config_path = Path(str(CONTRACT_HOME))
                 brownie._config._load_project_config(brownie_config_path)
                 logger.info("BCHConnectionImpl.connect() CONFIG: " + str(brownie.network.state.CONFIG.settings))
                 brownie.network.connect()
                 if brownie.network.is_connected():
                     logger.info("Connection to " + self.connector.server + " established successfully")
+                    project.load(brownie_config_path, "TtokenProject")
+                    logger.info("Contract compilation finished successfully")
                 else:
                     logger.info("Connection to " + self.connector.server + " FAILED!!!")
         except ConnectionError as err:
