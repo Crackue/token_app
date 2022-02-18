@@ -42,6 +42,7 @@ def setup_dispatcher(dp):
     dp.add_handler(CommandHandler("my_contracts", my_contract_handler.get_contracts_command))
     dp.add_handler(CommandHandler("create_contract", on_create_contract_handler.command_create_contract))
     dp.add_handler(erc20_handler.erc20_conv_handler)
+    dp.add_handler(CommandHandler("main_menu", on_start_menu_handler.command_start))
     dp.add_handler(CommandHandler("interact_with_contract", on_interact_with_contract_handler.command_interact_with_contract))
     dp.add_handler(CommandHandler("balance", base_handlers.balance_of))
     dp.add_handler(transfer_handler.transfer_conv_handler)

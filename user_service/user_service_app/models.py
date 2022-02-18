@@ -18,5 +18,6 @@ class EtherUser(Document):
     email = EmailField()
     eth_addresses = ListField(StringField(max_length=150, min_length=10))
     active_eth_address = StringField(max_length=150, min_length=10)
+    date_creation = DateTimeField(default=datetime.datetime.now())
     date_modified = DateTimeField(default=datetime.datetime.now())
     contract_addresses = ListField(StringField(max_length=150, min_length=10))

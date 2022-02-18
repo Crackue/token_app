@@ -50,6 +50,10 @@ class UserServices:
     def get_contracts_by_name(self, request) -> str:
         raise NotImplementedError
 
+    @abstractmethod
+    def set_contract_address_to_user(self, request) -> bool:
+        raise NotImplementedError
+
 
 class UserServicesRestImpl(UserServices):
 
@@ -140,6 +144,14 @@ class UserServicesRestImpl(UserServices):
         username = post['username']
         user_contracts = self.repository.get_user_contracts_by_name(request, username)
         return user_contracts
+
+    def update_user(self, request) -> bool:
+        post = request.POST if request.POST else json.loads(request.body)
+        username = post['username']
+        # TODO set delegation according to field
+        contract_address = post['contract_address']
+        response = self.repository.set_contract_address_to_user(username, contract_address)
+        return response
 
 
 serviceRest = UserServicesRestImpl()

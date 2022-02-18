@@ -2,7 +2,8 @@ import json
 import logging
 from abc import ABC, abstractmethod
 from contracts.services.repository import repository
-from utils import base_utils
+from utils import base_utils, contract_utils
+from brownie.exceptions import ContractExists
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +18,15 @@ class ContractServicesImpl(ContractServices):
     def deploy(self, request):
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
-        contract_name = post["contract_name"]
-        contract_symbol = post["contract_symbol"]
-        contract_supply = post["contract_supply"]
-        contract_supply_val = base_utils.get_num_with_decimals(contract_supply, 18)
-        repository.deploy(address_owner, contract_name, contract_symbol, contract_supply_val)
+        token_name = post["token_name"]
+        token_symbol = post["token_symbol"]
+        token_supply = post["token_supply"]
+        key_wallet = post["key_wallet"]
+        if contract_utils.is_contract_exist(address_owner, token_name):
+            raise ContractExists("Contract of owner " + address_owner + " with name " + token_name + " is already exist")
+        token_supply_val = base_utils.get_num_with_decimals(token_supply, 18)
+        token_info = repository.deploy(address_owner, token_name, token_symbol, token_supply_val, key_wallet)
+        return token_info
 
 
 contractService = ContractServicesImpl()

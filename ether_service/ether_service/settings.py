@@ -174,6 +174,10 @@ VVM_BINARY_PATH = BASE_DIR + env('VVM_BINARY_PATH_FOLDER')
 ETHERSCAN_TOKEN = env('ETHERSCAN_TOKEN')
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
+USER_SERVICE_HOST = env('USER_SERVICE_HOST')
+USER_PORT = env('USER_PORT')
+SCHEME = env('SCHEME')
+
 CACHES = {
 
     'default': {

@@ -9,4 +9,5 @@ urlpatterns = [
     path('is_logged_in/', views.is_logged_in, name='is_logged_in'),
     path('get_user_by_name/', views.get_user_address_by_name, name='get_user_address_by_name'),
     path('get_contracts/', views.get_contracts_by_name, name='get_user_contracts_by_name'),
+    path('update_user/', views.user_update, name='update user'),
 ]
