@@ -56,9 +56,9 @@ class UserRepositoryImpl(UserRepository):
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 user.active_eth_address = address
-                user.date_modified = datetime.datetime.now()
+                # user.date_modified = datetime.datetime.now()
                 try:
-                    user.save(update_fields=['active_eth_address', 'date_modified'])
+                    user.save(update_fields=['active_eth_address'])
                     return user
                 except Exception as exc:
                     logger.error(exc)
