@@ -17,3 +17,12 @@ def deploy(request) -> HttpResponse:
     except BaseException as exc:
         return HttpResponseBadRequest(reason=exc.args)
     return HttpResponse(_response_)
+
+
+@csrf_exempt
+def contract_by_address(request) -> HttpResponse:
+    try:
+        _response_ = _service_.contract_by_address(request)
+    except BaseException as exc:
+        return HttpResponseBadRequest(reason=exc.args)
+    return HttpResponse(_response_)

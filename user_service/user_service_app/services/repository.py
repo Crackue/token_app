@@ -116,7 +116,7 @@ class UserRepositoryImpl(UserRepository):
             logger.warning("User " + username + " does not exist. " + str(exc))
             return None
 
-    def get_user_contracts_by_name(self, request, username) -> tuple:
+    def get_user_contracts_by_name(self, request, username):
         try:
             user = EtherUser.objects.get(username=username)
             if user is not None:

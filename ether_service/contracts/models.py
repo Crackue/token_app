@@ -6,7 +6,7 @@ from mongoengine.base import fields
 
 class ContractModel(Document):
     contract_name = StringField(max_length=100)
-    contract_address = StringField(max_length=100)
+    contract_address = StringField(max_length=100, unique=True, required=True)
     contract_owner = StringField(max_length=100)
     token_name = StringField(max_length=100)
     token_symbol = StringField(max_length=100)

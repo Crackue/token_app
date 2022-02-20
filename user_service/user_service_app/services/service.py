@@ -139,11 +139,12 @@ class UserServicesRestImpl(UserServices):
         user_address = self.repository.get_user_address_by_name(request, username)
         return user_address
 
-    def get_contracts_by_name(self, request) -> tuple:
+    def get_contracts_by_name(self, request):
         post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
         user_contracts = self.repository.get_user_contracts_by_name(request, username)
-        return user_contracts
+        logger.info(str(user_contracts) + " contracts was retrieved fro user " + username)
+        return json.dumps(user_contracts)
 
     def update_user(self, request) -> bool:
         post = request.POST if request.POST else json.loads(request.body)

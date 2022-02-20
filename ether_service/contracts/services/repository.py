@@ -1,10 +1,15 @@
 import logging
 from abc import ABC, abstractmethod
 from brownie import accounts, project
+from django.http import Http404
+from mongoengine import DoesNotExist
+
 from ether_network import bch_connection
 from utils import contract_utils, transaction_utils, base_utils
 from ether_accounts.services import accounts_repository
 from ether_service.settings import ERC20_CONTRACT_NAME
+from contracts.models import ContractModel
+from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
 _repository_ = accounts_repository.repository
@@ -18,6 +23,10 @@ class ContractRepository(ABC):
 
     @abstractmethod
     def deploy(self, address_owner, token_name, token_symbol, token_supply_val):
+        raise NotImplementedError
+
+    @abstractmethod
+    def contract_by_address(self, contract_address):
         raise NotImplementedError
 
 
@@ -48,6 +57,13 @@ class ContractRepositoryImpl(ContractRepository):
             logger.exception(str(exc.args))
             return False, str(exc.args)
         return _contract_.to_json()
+
+    def contract_by_address(self, contract_address) -> ContractModel:
+        try:
+            contract = ContractModel.objects.get(contract_address=contract_address)
+        except DoesNotExist:
+            raise Http404("No MyModel matches the given query.")
+        return contract
 
 
 repository = ContractRepositoryImpl()

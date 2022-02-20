@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from utils.base_utils import amount_validate
 from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
-from bot_service.settings import USER_SERVICE_HOST, USER_PORT, SCHEME
+from bot_service.settings import USER_SERVICE_HOST, USER_PORT
 from urllib.parse import urlunsplit
 from utils import base_utils
 
@@ -74,7 +74,6 @@ def token_supply(update: Update, context: CallbackContext):
 
     response = requests.post(contract_deploy_endpoint, data=obj)
     if not response.status_code == 200:
-        response.reason
         update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END
 
@@ -84,7 +83,6 @@ def token_supply(update: Update, context: CallbackContext):
     obj = {"username": username, "contract_address": contract_address}
     requests.post(user_service_update_user_endpoint, data=obj)
     if not response.status_code == 200:
-        response.reason
         update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END
 
