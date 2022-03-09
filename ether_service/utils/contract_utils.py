@@ -1,14 +1,20 @@
 
 import json
 import logging
+import os
 from typing import List
 
+from brownie.network.contract import _DeployedContractBase
+from django.core.exceptions import RequestAborted
+
+from ether_network import bch_connection
 from brownie import Contract, accounts
 from brownie.network.transaction import TransactionReceipt
 from ether_service.settings import BASE_DIR
 from contracts.models import ContractModel
 
 logger = logging.getLogger(__name__)
+ERC20_CONTRACT_NAME = os.getenv('ERC20_CONTRACT_NAME')
 
 
 def get_contract_abi(contract_name: str):
@@ -19,7 +25,7 @@ def get_contract_abi(contract_name: str):
     return json_
 
 
-def load_contract(owner_address, contract_address, contract_json):
+def load_contract_from_abi(owner_address, contract_address, contract_json):
     _abi_ = contract_json["abi"]
     _contract_name_ = contract_json["contractName"]
     _account_owner_ = accounts.at(owner_address, True)
@@ -28,6 +34,15 @@ def load_contract(owner_address, contract_address, contract_json):
     logger.info("Contract " + contract_.address + " was loaded")
     logger.info(accounts.__dict__)
     return contract_
+
+
+def get_contract_from_abi(owner_address, contract_address) -> Contract:
+    try:
+        contract_json = get_contract_abi(ERC20_CONTRACT_NAME)
+        _contract_ = load_contract_from_abi(owner_address, contract_address, contract_json)
+        return _contract_
+    except Exception as exc:
+        raise RequestAborted(str(exc.args))
 
 
 def contract_handler(tx: TransactionReceipt, address_owner, token_name, token_symbol, token_supply_val, token_functions) -> ContractModel:
@@ -61,4 +76,9 @@ def get_functions_names_from_abi(abi: List) -> List:
 def is_contract_exist(contract_owner, token_name) -> bool:
     contracts = ContractModel.objects.filter(contract_owner=contract_owner, token_name=token_name)
     return contracts.count() > 0
+
+
+def get_contract(contract_address) -> _DeployedContractBase:
+    contract = Contract(contract_address)
+    return contract
 

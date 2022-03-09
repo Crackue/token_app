@@ -1,8 +1,6 @@
 import logging
-
-from django.core.exceptions import BadRequest
+import json
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from contracts.services.service import contractService
 
@@ -26,3 +24,9 @@ def contract_by_address(request) -> HttpResponse:
     except BaseException as exc:
         return HttpResponseBadRequest(reason=exc.args)
     return HttpResponse(_response_)
+
+
+@csrf_exempt
+def load_contract_and_set_to_cache(request) -> HttpResponse:
+    response = _service_.load_contract(request)
+    return HttpResponse(response)

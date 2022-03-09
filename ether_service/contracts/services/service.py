@@ -18,6 +18,10 @@ class ContractServices(ABC):
     def contract_by_address(self, request):
         raise NotImplementedError
 
+    @abstractmethod
+    def load_contract(self, request):
+        raise NotImplementedError
+
 
 class ContractServicesImpl(ContractServices):
     def deploy(self, request):
@@ -38,6 +42,17 @@ class ContractServicesImpl(ContractServices):
         contract_address = post["contract_address"]
         contract = repository.contract_by_address(contract_address)
         return contract.to_json()
+
+    def load_contract(self, request):
+        post = request.POST if request.POST else json.loads(request.body)
+        address_owner = post['address_owner']
+        contract_address = request.session.get(address_owner)
+        if not contract_address:
+            contract_address = post['contract_address']
+            # contract = contract_utils.get_contract(user_address, contract_address)
+            # contract_cache = ContractCache(contract)
+            request.session[address_owner] = contract_address
+        return repository.load_contract(contract_address, address_owner)
 
 
 contractService = ContractServicesImpl()

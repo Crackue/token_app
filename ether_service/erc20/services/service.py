@@ -2,9 +2,12 @@ import json
 import logging
 from abc import ABC
 
+from brownie.exceptions import ContractNotFound
+from django.http import HttpResponseBadRequest
+
 from erc20.services.repository import repository
 from erc20.services.ERC_20 import ERC_20
-from utils import base_utils
+from utils import base_utils, contract_utils
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +37,15 @@ class TokenServiceImpl(TokenService):
 
     def balance_of(self, request) -> tuple:
         post = request.POST if request.POST else json.loads(request.body)
-        user_address = post['user_address']
-        _balance_of_ = self.repository.balance_of(user_address)
+        address_owner = post['address_owner']
+        contract_address = request.session.get(address_owner)
+        if not contract_address:
+            raise HttpResponseBadRequest(reason="Contract was not loaded")
+        contract = contract_utils.get_contract(contract_address)
+        if not contract:
+            raise ContractNotFound("Contract " + contract_address + " was not found")
+        request.session[address_owner] = contract_address
+        _balance_of_ = self.repository.balance_of(address_owner, contract)
         # TODO 18 hardcode
         res = True, base_utils.num_without_decimals(_balance_of_[1], 18)
         if _balance_of_[0]:
@@ -45,12 +55,20 @@ class TokenServiceImpl(TokenService):
 
     def transfer(self, request) -> tuple:
         post = request.POST if request.POST else json.loads(request.body)
+
         address_to = post["address_to"]
         _value_ = post["value"]
         address_owner = post["address_owner"]
+        contract_address = request.session.get(address_owner)
+        if not contract_address:
+            raise HttpResponseBadRequest(reason="Contract was not loaded")
+        contract = contract_utils.get_contract(contract_address)
+        if not contract:
+            raise ContractNotFound("Contract " + contract_address + " was not found")
+        request.session[address_owner] = contract_address
         # TODO 18 hardcode
         val = base_utils.get_num_with_decimals(_value_, 18)
-        _transfer_ = self.repository.transfer(address_owner, address_to, val)
+        _transfer_ = self.repository.transfer(address_owner, address_to, val, contract)
         return json.dumps(_transfer_)
 
     def transfer_from(self, request, address_from=None, address_to=None, value=None) -> bool:
@@ -61,7 +79,14 @@ class TokenServiceImpl(TokenService):
         # TODO 18 hardcode
         val = base_utils.get_num_with_decimals(value, 18)
         address_owner = post["msg_owner"]
-        _transfer_from_ = self.repository.transfer_from(address_owner, address_from, address_to, val)
+        contract_address = request.session.get(address_owner)
+        if not contract_address:
+            raise HttpResponseBadRequest(reason="Contract was not loaded")
+        contract = contract_utils.get_contract(contract_address)
+        if not contract:
+            raise ContractNotFound("Contract " + contract_address + " was not found")
+        request.session[address_owner] = contract_address
+        _transfer_from_ = self.repository.transfer_from(address_owner, address_from, address_to, val, contract)
         return json.dumps(_transfer_from_)
 
     def approve(self, request) -> bool:
@@ -71,14 +96,28 @@ class TokenServiceImpl(TokenService):
         # TODO 18 hardcode
         val = base_utils.get_num_with_decimals(value, 18)
         address_owner = post["address_owner"]
-        _approve_ = self.repository.approve(address_owner, address_spender, val)
+        contract_address = request.session.get(address_owner)
+        if not contract_address:
+            raise HttpResponseBadRequest(reason="Contract was not loaded")
+        contract = contract_utils.get_contract(contract_address)
+        if not contract:
+            raise ContractNotFound("Contract " + contract_address + " was not found")
+        request.session[address_owner] = contract_address
+        _approve_ = self.repository.approve(address_owner, address_spender, val, contract)
         return json.dumps(_approve_)
 
     def allowance(self, request) -> tuple:
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
+        contract_address = request.session.get(address_owner)
+        if not contract_address:
+            raise HttpResponseBadRequest(reason="Contract was not loaded")
+        contract = contract_utils.get_contract(contract_address)
+        if not contract:
+            raise ContractNotFound("Contract " + contract_address + " was not found")
+        request.session[address_owner] = contract_address
         address_spender = post["address_spender"]
-        _allowance_ = self.repository.allowance(address_owner, address_spender)
+        _allowance_ = self.repository.allowance(address_owner, address_spender, contract)
         if _allowance_[0]:
             value = base_utils.num_without_decimals(_allowance_[1], 18)
             allow = True, value

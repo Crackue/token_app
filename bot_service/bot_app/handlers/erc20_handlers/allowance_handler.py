@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
 from urllib.parse import urlunsplit
-from utils import base_utils
+from utils import base_utils, session_utils
 
 logger = logging.getLogger(__name__)
 
@@ -46,11 +46,18 @@ def get_spender_name_allowance(update: Update, context: CallbackContext):
         return ConversationHandler.END
 
     obj = {"address_owner": address_owner[1], "address_spender": address_spender[1]}
+    ss = session_utils.get_session_store(update)
     try:
+        session_id = ss['ether_service_session_id']
+        cookies = dict(sessionid=session_id)
+        response = requests.post(ether_erc20_allowance_endpoint, data=obj, cookies=cookies)
+    except KeyError:
         response = requests.post(ether_erc20_allowance_endpoint, data=obj)
-    except Exception as exc:
-        logger.exception(exc)
-        update.message.reply_text("FAILED: " + str(exc.args))
+        session_id = response.cookies.get_dict()['sessionid']
+        ss['ether_service_session_id'] = session_id
+        ss.save()
+    if not response.status_code == 200:
+        update.message.reply_text("FAILED: " + response.reason)
         return ConversationHandler.END
     resp = json.loads(response.text)
     if resp[0]:

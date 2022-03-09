@@ -10,7 +10,7 @@ from urllib.parse import urlunsplit
 from utils import base_utils
 
 logger = logging.getLogger(__name__)
-TOKEN_NAME, TOKEN_SYMBOL, TOKEN_SUPPLY, CONTRACT_KEY_WALLET = range(4)
+TOKEN_NAME, TOKEN_SYMBOL, TOKEN_SUPPLY = range(3)
 dto = {}
 
 ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT if SCHEME == "http" else ETHER_SERVICE_HOST

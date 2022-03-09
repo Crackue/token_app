@@ -6,7 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, Conve
 from utils.base_utils import amount_validate
 from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
 from urllib.parse import urlunsplit
-from utils import base_utils
+from utils import base_utils, session_utils
 
 logger = logging.getLogger(__name__)
 
@@ -68,11 +68,18 @@ def get_value_tr_from(update: Update, context: CallbackContext):
         return ConversationHandler.END
 
     obj = {"msg_owner": is_logged_in[1], "address_from": address_from[1], "address_to": address_to[1], "value": value}
+    ss = session_utils.get_session_store(update)
     try:
+        session_id = ss['ether_service_session_id']
+        cookies = dict(sessionid=session_id)
+        response = requests.post(ether_erc20_transfer_from_endpoint, data=obj, cookies=cookies)
+    except KeyError:
         response = requests.post(ether_erc20_transfer_from_endpoint, data=obj)
-    except Exception as exc:
-        logger.exception(exc)
-        update.message.reply_text("Something goes wrong... Try again")
+        session_id = response.cookies.get_dict()['sessionid']
+        ss['ether_service_session_id'] = session_id
+        ss.save()
+    if not response.status_code == 200:
+        update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END
     resp = json.loads(response.text)
     if resp[0]:

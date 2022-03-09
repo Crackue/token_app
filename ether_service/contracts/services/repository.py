@@ -1,6 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
 from brownie import accounts, project
+from brownie.network.contract import ProjectContract, Contract, _DeployedContractBase
+from brownie.project.main import Project
 from django.http import Http404
 from mongoengine import DoesNotExist
 
@@ -17,9 +19,13 @@ _repository_ = accounts_repository.repository
 
 class ContractRepository(ABC):
 
+    _project_: Project = None
+
     def __init__(self):
         self.bch = bch_connection.bch_connection
         self.bch.connect()
+        projects_list = project.get_loaded_projects()
+        self._project_ = projects_list[0]
 
     @abstractmethod
     def deploy(self, address_owner, token_name, token_symbol, token_supply_val):
@@ -29,14 +35,16 @@ class ContractRepository(ABC):
     def contract_by_address(self, contract_address):
         raise NotImplementedError
 
+    @abstractmethod
+    def load_contract(self, contract_address):
+        raise NotImplementedError
+
 
 class ContractRepositoryImpl(ContractRepository):
     def deploy(self, address_owner, token_name, token_symbol, token_supply_val, key_wallet):
         if key_wallet:
             address_owner = _repository_.add(key_wallet)
-        _projects_ = project.get_loaded_projects()
-        proj = _projects_[0]
-        erc20token = proj[ERC20_CONTRACT_NAME]
+        erc20token = self._project_[ERC20_CONTRACT_NAME]
         contract_utils.is_contract_exist(address_owner, token_name)
         try:
             contract = erc20token.deploy(token_supply_val, token_name, token_symbol,
@@ -63,6 +71,19 @@ class ContractRepositoryImpl(ContractRepository):
             contract = ContractModel.objects.get(contract_address=contract_address)
         except DoesNotExist:
             raise Http404("No MyModel matches the given query.")
+        return contract
+
+    def load_contract(self, contract_address, address_owner: str) -> _DeployedContractBase:
+        contract = None
+        try:
+            contract = Contract('alias_' + address_owner)
+        except ValueError as err:
+            logger.error(str(err.args))
+        if not contract:
+            contract = Contract(contract_address)  # isinstance(contract, Contract)
+            user_address_0x = 'alias_' + address_owner
+            contract.set_alias(user_address_0x)
+            # contract = erc20token.at(contract_address, user_address) # isinstance(contract, ProjectContract)
         return contract
 
 
