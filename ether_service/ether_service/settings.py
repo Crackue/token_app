@@ -21,7 +21,6 @@ env = Env(
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-
 BASE_DIR = root
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,7 +28,7 @@ BASE_DIR = root
 ENV_PATH = env.str('ENV_PATH')
 env.read_env(BASE_DIR + "/" + ENV_PATH)
 
-# HOME = env.str('HOME')
+os.environ['HOME'] = root + "/ttoken"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -180,10 +179,10 @@ SCHEME = env('SCHEME')
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_COOKIE_AGE = 5*60
-CACHES = {
 
+CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379',
+        'LOCATION': env('REDIS_URL'),
     }
 }

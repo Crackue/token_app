@@ -49,8 +49,6 @@ class ContractServicesImpl(ContractServices):
         contract_address = request.session.get(address_owner)
         if not contract_address:
             contract_address = post['contract_address']
-            # contract = contract_utils.get_contract(user_address, contract_address)
-            # contract_cache = ContractCache(contract)
             request.session[address_owner] = contract_address
         return repository.load_contract(contract_address, address_owner)
 

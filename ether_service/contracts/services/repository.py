@@ -80,10 +80,12 @@ class ContractRepositoryImpl(ContractRepository):
         except ValueError as err:
             logger.error(str(err.args))
         if not contract:
-            contract = Contract(contract_address)  # isinstance(contract, Contract)
-            user_address_0x = 'alias_' + address_owner
-            contract.set_alias(user_address_0x)
-            # contract = erc20token.at(contract_address, user_address) # isinstance(contract, ProjectContract)
+            try:
+                contract = Contract.from_explorer(contract_address)
+                user_address_0x = 'alias_' + address_owner
+                contract.set_alias(user_address_0x)
+            except Exception as exc:
+                logger.exception(str(exc.args))
         return contract
 
 
