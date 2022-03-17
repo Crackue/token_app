@@ -9,6 +9,5 @@ nohup.out
 Library
 .docker
 .env.prod
-.brownie
 .npm
 .config

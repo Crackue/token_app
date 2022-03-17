@@ -4,9 +4,10 @@ __pycache__
 hesis/
 .idea
 .env.dev
-.brownie
 .solcx
 .vvm
+.hypothesis/
+.brownie
 scripts
 bot_commands
 venv
