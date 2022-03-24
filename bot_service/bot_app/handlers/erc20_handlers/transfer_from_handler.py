@@ -82,10 +82,10 @@ def get_value_tr_from(update: Update, context: CallbackContext):
         update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END
     resp = json.loads(response.text)
-    if resp[0]:
-        update.message.reply_text("Done!")
+    if resp:
+        update.message.reply_text(f"Done! Transaction Info: {resp}")
     else:
-        update.message.reply_text("FAILED: " + resp[1])
+        update.message.reply_text("FAILED! Try again")
     return ConversationHandler.END
 
 

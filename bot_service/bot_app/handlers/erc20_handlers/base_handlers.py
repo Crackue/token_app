@@ -57,9 +57,9 @@ def balance_of(update: Update, context: CallbackContext):
         return
 
     resp = json.loads(response.text)
-    if resp[0]:
-        update.message.reply_text("Your balance: " + str(resp[1]))
-        logger.info("Balance of user " + username + ": " + str(resp[1]))
+    if resp:
+        update.message.reply_text("Your balance: " + str(resp))
+        logger.info("Balance of user " + username + ": " + str(resp))
     else:
-        logger.warning("Get balance_of for user " + username + " is FAILED!: " + str(resp[1]))
-        update.message.reply_text("FAILED! " + str(resp[1]))
+        logger.warning("Get balance_of for user " + username + " is FAILED!: " + str(resp))
+        update.message.reply_text("FAILED! " + str(resp))

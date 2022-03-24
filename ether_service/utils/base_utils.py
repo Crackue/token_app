@@ -10,7 +10,6 @@ def get_num_with_decimals(amount, decimals) -> int:
 
 
 def num_without_decimals(amount, decimals) -> int:
-    value = int(amount)
     return amount / pow(10, decimals)
 
 

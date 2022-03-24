@@ -1,10 +1,11 @@
 import logging
 from abc import ABC, abstractmethod
 from brownie import accounts, project
+from brownie.exceptions import RPCRequestError
 from brownie.network.contract import ProjectContract, Contract, _DeployedContractBase
 from brownie.project.main import Project
 from django.http import Http404
-from mongoengine import DoesNotExist
+from mongoengine import DoesNotExist, OperationError
 
 from ether_network import bch_connection
 from utils import contract_utils, transaction_utils, base_utils
@@ -32,11 +33,11 @@ class ContractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def contract_by_address(self, contract_address):
+    def contract_by_address(self, contract_address=None):
         raise NotImplementedError
 
     @abstractmethod
-    def load_contract(self, contract_address):
+    def load_contract(self, contract_address=None, address_owner=None):
         raise NotImplementedError
 
 
@@ -51,6 +52,7 @@ class ContractRepositoryImpl(ContractRepository):
                                          {'from': address_owner}, publish_source=True)
         except Exception as exc:
             logger.exception(str(exc.args))
+            raise RPCRequestError(exc.args)
 
         transaction = transaction_utils.transaction_receipt_handler(contract.tx)
         token_supple = base_utils.num_without_decimals(int(token_supply_val), 18)
@@ -63,17 +65,17 @@ class ContractRepositoryImpl(ContractRepository):
             _contract_.save()
         except Exception as exc:
             logger.exception(str(exc.args))
-            return False, str(exc.args)
+            raise OperationError(exc.args)
         return _contract_.to_json()
 
-    def contract_by_address(self, contract_address) -> ContractModel:
+    def contract_by_address(self, contract_address=None) -> ContractModel:
         try:
             contract = ContractModel.objects.get(contract_address=contract_address)
         except DoesNotExist:
             raise Http404("No MyModel matches the given query.")
         return contract
 
-    def load_contract(self, contract_address, address_owner: str) -> _DeployedContractBase:
+    def load_contract(self, contract_address=None, address_owner=None) -> _DeployedContractBase:
         contract = None
         try:
             contract = Contract('alias_' + address_owner)

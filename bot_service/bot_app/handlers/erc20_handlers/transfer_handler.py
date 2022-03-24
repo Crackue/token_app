@@ -72,7 +72,7 @@ def get_value(update: Update, context: CallbackContext):
         return ConversationHandler.END
     resp = json.loads(response.text)
 
-    if resp[0]:
+    if resp:
         message_q_set = TelegramMessage.objects.filter(message__chat__username=name_recipient)
         message_obj = message_q_set.order_by('date_modified').first()
         if message_obj:
@@ -83,9 +83,9 @@ def get_value(update: Update, context: CallbackContext):
             except Exception as exc:
                 update.message.reply_text("FAILED. " + str(exc.args))
                 return ConversationHandler.END
-        update.message.reply_text("Done!")
+        update.message.reply_text(f"Done! Transaction Info: {resp}")
     else:
-        update.message.reply_text("FAILED: " + resp[1])
+        update.message.reply_text("FAILED! Try again")
     return ConversationHandler.END
 
 

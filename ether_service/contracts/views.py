@@ -1,7 +1,11 @@
 import logging
 import json
+
+from brownie.exceptions import RPCRequestError
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from mongoengine import OperationError
+
 from contracts.services.service import contractService
 
 _service_ = contractService
@@ -12,7 +16,14 @@ logger = logging.getLogger(__name__)
 def deploy(request) -> HttpResponse:
     try:
         _response_ = _service_.deploy(request)
-    except BaseException as exc:
+    except RPCRequestError as rpc:
+        logger.exception(str(rpc.args))
+        return HttpResponseBadRequest(reason=rpc.args)
+    except OperationError as oe:
+        logger.exception(str(oe.args))
+        return HttpResponseBadRequest(reason=oe.args)
+    except Exception as exc:
+        logger.exception(str(exc.args))
         return HttpResponseBadRequest(reason=exc.args)
     return HttpResponse(_response_)
 

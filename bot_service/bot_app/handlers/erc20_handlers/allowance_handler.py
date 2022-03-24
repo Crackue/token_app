@@ -60,10 +60,10 @@ def get_spender_name_allowance(update: Update, context: CallbackContext):
         update.message.reply_text("FAILED: " + response.reason)
         return ConversationHandler.END
     resp = json.loads(response.text)
-    if resp[0]:
-        update.message.reply_text("Allowance: " + str(resp[1]))
+    if resp:
+        update.message.reply_text("Allowance: " + str(resp))
     else:
-        update.message.reply_text("FAILED: " + resp[1])
+        update.message.reply_text("FAILED! Try again")
     return ConversationHandler.END
 
 
