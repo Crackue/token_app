@@ -37,6 +37,7 @@ def get_value(update: Update, context: CallbackContext):
         return VALUE
 
     name_recipient = dto['name_recipient']
+    member = bot_request_utils.is_chat_member(update, name_recipient)
     address_to = base_utils.get_user_address_by_name(name_recipient)
     if not address_to[0]:
         update.message.reply_text(address_to[1])
@@ -76,6 +77,7 @@ def get_value(update: Update, context: CallbackContext):
                 update.message.reply_text("FAILED. " + str(exc.args))
                 return ConversationHandler.END
         update.message.reply_text(f"Done! Transaction Info: {resp}")
+
     else:
         update.message.reply_text("FAILED! Try again")
     return ConversationHandler.END
