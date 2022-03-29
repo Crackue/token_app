@@ -13,4 +13,5 @@ urlpatterns = [
     path('transfer_from/', views.transfer_from, name='transfer_from'),
     path('approve/', views.approve, name='approve'),
     path('allowance/', views.allowance, name='allowance'),
+    path('contract_info/', views.contract_info, name='contract_info'),
 ]

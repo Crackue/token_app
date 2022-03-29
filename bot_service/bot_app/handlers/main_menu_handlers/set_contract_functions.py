@@ -19,7 +19,7 @@ def command_interact_with_contract(update: Update, context: CallbackContext) -> 
             transfer_from = BotCommand("transfer_from", "transfer from")
             approve = BotCommand("approve", "approve withdraw to smth...")
             allowance = BotCommand("allowance", "allowance from... to...")
-            get_info = BotCommand("get_info", "get contract info")
+            get_info = BotCommand("contract_info", "get contract info")
             main_menu = BotCommand("main_menu", "back to main menu")
             commands_chat = [balance, transfer, transfer_from, approve, allowance, get_info, main_menu]
             context.bot.set_my_commands(commands_chat, timeout=None, api_kwargs=None, scope=scope)

@@ -4,28 +4,12 @@ import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from utils.base_utils import amount_validate
-from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
-from bot_service.settings import USER_SERVICE_HOST, USER_PORT
-from urllib.parse import urlunsplit
+from constants import url_constants
 from utils import base_utils
 
 logger = logging.getLogger(__name__)
 TOKEN_NAME, TOKEN_SYMBOL, TOKEN_SUPPLY = range(3)
 dto = {}
-
-ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT if SCHEME == "http" else ETHER_SERVICE_HOST
-
-contract_base = "contract/"
-contract_deploy = "deploy/"
-path_deploy = contract_base + contract_deploy
-contract_deploy_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_deploy, "", ""))
-
-NETLOC = USER_SERVICE_HOST + ":" + USER_PORT if SCHEME == "http" else USER_SERVICE_HOST
-
-user_service_base = "user/"
-user_service_update_user = "update_user/"
-path_update_user = user_service_base + user_service_update_user
-user_service_update_user_endpoint = urlunsplit((SCHEME, NETLOC, path_update_user, "", ""))
 
 
 def erc20_command(update: Update, context: CallbackContext):
@@ -72,7 +56,8 @@ def token_supply(update: Update, context: CallbackContext):
     obj = {"address_owner": dto['address_owner'], "token_name": dto['token_name'],
            "token_symbol": dto['token_symbol'], "token_supply": value, "key_wallet": ""}
 
-    response = requests.post(contract_deploy_endpoint, data=obj)
+    response = requests.post(url_constants.contract_deploy_endpoint, data=obj)
+
     if not response.status_code == 200:
         update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END
@@ -81,7 +66,7 @@ def token_supply(update: Update, context: CallbackContext):
     contract_address = resp['contract_address']
     username = update.message.from_user['username']
     obj = {"username": username, "contract_address": contract_address}
-    requests.post(user_service_update_user_endpoint, data=obj)
+    requests.post(url_constants.user_service_update_user_endpoint, data=obj)
     if not response.status_code == 200:
         update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END

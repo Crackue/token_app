@@ -4,18 +4,10 @@ import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from utils.base_utils import amount_validate
-from bot_service.settings import ETHER_SERVICE_HOST, ETHER_PORT, SCHEME
-from urllib.parse import urlunsplit
+from constants import url_constants
 from utils import base_utils, session_utils
 
 logger = logging.getLogger(__name__)
-
-ETHER_NETLOC = ETHER_SERVICE_HOST + ":" + ETHER_PORT if SCHEME == "http" else ETHER_SERVICE_HOST
-
-ether_erc20_base = "erc20/"
-ether_erc20_approve = "approve/"
-path_approve = ether_erc20_base + ether_erc20_approve
-ether_erc20_approve_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_approve, "", ""))
 
 RECIPIENT_NAME, VALUE = range(2)
 dto = {}
@@ -59,9 +51,9 @@ def get_value(update: Update, context: CallbackContext):
     try:
         session_id = ss['ether_service_session_id']
         cookies = dict(sessionid=session_id)
-        response = requests.post(ether_erc20_approve_endpoint, data=obj, cookies=cookies)
+        response = requests.post(url_constants.ether_erc20_approve_endpoint, data=obj, cookies=cookies)
     except KeyError:
-        response = requests.post(ether_erc20_approve_endpoint, data=obj)
+        response = requests.post(url_constants.ether_erc20_approve_endpoint, data=obj)
         session_id = response.cookies.get_dict()['sessionid']
         ss['ether_service_session_id'] = session_id
         ss.save()

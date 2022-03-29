@@ -64,7 +64,8 @@ def transfer(request) -> HttpResponse:
         logger.exception(str(ua.args))
         return HttpResponseNotFound(reason=ua.args)
     except OperationError as oe:
-        logger.exception(str(oe.args))
+        logger.exception\
+            (str(oe.args))
         return HttpResponseBadRequest(reason=oe.args)
     except Exception as exc:
         logger.exception(str(exc.args))
@@ -112,3 +113,13 @@ def allowance(request) -> HttpResponse:
         logger.exception(str(exc.args))
         return HttpResponseBadRequest(reason=exc.args)
     return HttpResponse(_allowance_)
+
+
+@csrf_exempt
+def contract_info(request) -> HttpResponse:
+    try:
+        _contract_info_ = _service_.contract_info(request)
+    except Exception as exc:
+        logger.exception(str(exc.args))
+        return HttpResponseBadRequest(reason=exc.args)
+    return HttpResponse(_contract_info_)

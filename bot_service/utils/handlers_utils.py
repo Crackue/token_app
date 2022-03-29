@@ -28,3 +28,13 @@ def convert_contract_json_to_str_reply(contract_json):
                 'Token Functions: ' + str(contract_json['token_functions']) + '\n' + \
                 'Date Creation: ' + str(date_creation)
     return contracts
+
+
+def convert_contract_json_to_str_reply_contract_info(contract_json):
+    contracts = f"Contract Address: {contract_json['contract_address']}\n" \
+                f"Token Name: {contract_json['token_name']}\n" \
+                f"Token Symbol: {contract_json['token_symbol']}\n" \
+                f"Token Decimals: {contract_json['token_decimals']}\n" \
+                f"Token Supply: {contract_json['token_supply']}\n" \
+                f"Token Functions: {contract_json['token_functions']}"
+    return contracts

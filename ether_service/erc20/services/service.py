@@ -1,6 +1,6 @@
 import json
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from brownie.exceptions import ContractNotFound
 from brownie.network.contract import _DeployedContractBase
@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 class TokenService(ERC_20, ABC):
     def __init__(self):
         self.repository = repository
+
+    @abstractmethod
+    def contract_info(self):
+        raise NotImplementedError
 
 
 class TokenServiceImpl(TokenService):
@@ -102,6 +106,18 @@ class TokenServiceImpl(TokenService):
             allow = True, value
             return json.dumps(allow)
         return json.dumps(_allowance_)
+
+    def contract_info(self, request):
+        contract = self.retrieve_contract(request)
+        _total_supply_ = self.repository.total_supply(contract)
+        _contract_info_ = {
+            'contract_address': contract.address,
+            'token_name': self.repository.name(contract),
+            'token_symbol': self.repository.symbol(contract),
+            'token_decimals': str(self.repository.decimals(contract)),
+            'token_supply': str(base_utils.num_without_decimals(_total_supply_, 18)),
+            'token_functions': contract_utils.get_functions_names_from_abi(contract.abi)}
+        return json.dumps(_contract_info_)
 
     @staticmethod
     def retrieve_contract(request) -> _DeployedContractBase:

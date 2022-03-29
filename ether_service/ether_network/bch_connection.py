@@ -1,15 +1,11 @@
 import logging
-import sys
 
 import brownie
 from abc import abstractmethod
 from pathlib import Path
 
-from brownie._config import CONFIG, DATA_FOLDER
-
 from ether_service.settings import BASE_DIR, CONTRACT_HOME
-from brownie import project, network
-from brownie._cli import console
+from brownie import project
 
 logger = logging.getLogger(__name__)
 
