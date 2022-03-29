@@ -3,28 +3,12 @@ import json
 import requests
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
-from bot_service.settings import USER_SERVICE_HOST, USER_PORT, SCHEME
-from urllib.parse import urlunsplit
-from utils import base_utils
+from constants import url_constants
+from utils import base_utils, session_utils
 
 logger = logging.getLogger(__name__)
 
 KEY, WALLET_ADDRESS = range(2)
-
-NETLOC = USER_SERVICE_HOST + ":" + USER_PORT if SCHEME == "http" else USER_SERVICE_HOST
-
-user_service_base = "user/"
-user_service_login = "login/"
-user_service_logout = "logout/"
-user_service_signin = "signin/"
-
-path_login = user_service_base + user_service_login
-path_logout = user_service_base + user_service_logout
-path_signin = user_service_base + user_service_signin
-
-user_service_login_endpoint = urlunsplit((SCHEME, NETLOC, path_login, "", ""))
-user_service_logout_endpoint = urlunsplit((SCHEME, NETLOC, path_logout, "", ""))
-user_service_signin_endpoint = urlunsplit((SCHEME, NETLOC, path_signin, "", ""))
 
 
 def repeat_or_stop(update: Update, context: CallbackContext):
@@ -51,16 +35,25 @@ def get_key(update: Update, context: CallbackContext):
 
     key = update.message.text
     obj = {"key": key, "username": username, "address_owner": address_owner}
+
+    ss = session_utils.get_session_store(update)
     try:
-        response = requests.post(user_service_login_endpoint, data=obj)
-    except Exception as exc:
-        logger.exception(exc)
-        update.message.reply_text("Something goes wrong... " + str(exc.args) + ". Try again")
+        session_id = ss['user_service_session_id']
+        cookies = dict(sessionid=session_id)
+        response = requests.post(url_constants.user_service_login_endpoint, data=obj, cookies=cookies)
+    except KeyError:
+        response = requests.post(url_constants.user_service_login_endpoint, data=obj)
+        session_id = response.cookies.get_dict()['sessionid']
+        ss['user_service_session_id'] = session_id
+        ss.save()
+
+    if not response.status_code == 200:
+        update.message.reply_text("Something goes wrong... " + response.reason + ". Try again")
         return ConversationHandler.END
     resp = json.loads(response.text)
 
     if resp is None:
-        logger.info("Request post to " + user_service_login_endpoint + " FAILED")
+        logger.info("Request post to " + url_constants.user_service_login_endpoint + " FAILED")
         update.message.reply_text("Something wrong. Try again later")
         return ConversationHandler.END
 
@@ -93,12 +86,12 @@ def logout(update: Update, context: CallbackContext):
     obj = {"username": username}
     response = None
     try:
-        response = requests.post(user_service_logout_endpoint, data=obj)
+        response = requests.post(url_constants.user_service_logout_endpoint, data=obj)
     except Exception as exc:
         logger.exception(exc)
 
     if response is None:
-        logger.info("Request post to " + user_service_logout_endpoint + " FAILED")
+        logger.info("Request post to " + url_constants.user_service_logout_endpoint + " FAILED")
         update.message.reply_text("Something wrong. Try again later")
         return ConversationHandler.END
 
@@ -123,13 +116,13 @@ def get_address(update: Update, context: CallbackContext):
     obj = {"eth_address": eth_address, "username": username}
     response = None
     try:
-        response = requests.post(user_service_signin_endpoint, data=obj)
+        response = requests.post(url_constants.user_service_signin_endpoint, data=obj)
     except Exception as exc:
         logger.exception(exc)
         return ConversationHandler.END
 
     if response is None:
-        logger.info("Request post to " + user_service_signin_endpoint + " FAILED")
+        logger.info("Request post to " + url_constants.user_service_signin_endpoint + " FAILED")
         update.message.reply_text("Something wrong. Try again later")
         return ConversationHandler.END
 

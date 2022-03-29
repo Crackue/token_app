@@ -22,7 +22,7 @@ class Transaction(Document):
     gas_price = StringField(max_length=100)
     gas_limit = StringField(max_length=100)
     gas_used = StringField(max_length=100)
-    input = StringField(max_length=500)
+    input = StringField(max_length=10000)
     confirmations = IntField()
     nonce = StringField(max_length=200)
     block_number = IntField()

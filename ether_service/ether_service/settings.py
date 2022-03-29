@@ -21,7 +21,6 @@ env = Env(
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-
 BASE_DIR = root
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,7 +28,7 @@ BASE_DIR = root
 ENV_PATH = env.str('ENV_PATH')
 env.read_env(BASE_DIR + "/" + ENV_PATH)
 
-# HOME = env.str('HOME')
+os.environ['HOME'] = root + "/ttoken"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -52,6 +51,7 @@ INSTALLED_APPS = [
     'ether_network.apps.NetworkConfig',
     'ether_accounts.apps.EtherAccountsConfig',
     'erc20.apps.Erc20Config',
+    'contracts.apps.ContractsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -164,16 +164,18 @@ LOGGING = {
     },
 }
 
-ERC20_CONTRACT_ADDRESS = env.str('ERC20_CONTRACT_ADDRESS')
 ERC20_CONTRACT_NAME = env.str('ERC20_CONTRACT_NAME')
-ERC20_OWNER_ADDRESS = env.str('ERC20_OWNER_ADDRESS')
+CONTRACT_HOME = BASE_DIR + "/ttoken"
+SOLCX_BINARY_PATH = BASE_DIR + env('SOLCX_BINARY_PATH_FOLDER')
+VVM_BINARY_PATH = BASE_DIR + env('VVM_BINARY_PATH_FOLDER')
+ETHERSCAN_TOKEN = env('ETHERSCAN_TOKEN')
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_COOKIE_AGE = 5*60
 
 CACHES = {
-
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': env('REDIS_URL'),
     }
 }

@@ -33,12 +33,14 @@ networks:
         host: https://ropsten.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
 
 compiler:
-    evm_version: null
+    evm_version: istanbul
     minify_source: false
     solc:
-        version: null
+        version: 0.8.11
         optimize: true
         runs: 200
+#        remappings:
+#            - "@openzeppelin=../OpenZeppelin/openzeppelin-contracts@4.3.3"
 
 console:
     show_colors: true
@@ -63,6 +65,7 @@ hypothesis:
         generate: true
         target: true
         shrink: true
+
 pytest:
     # these settings replace the defaults when running pytest
     gas_limit: 6721975
@@ -71,5 +74,9 @@ pytest:
     revert_traceback: true
 
 autofetch_sources: false
-dependencies: null
+
+dependencies:
+#    - aragon/aragonOS@4.0.0
+#    - OpenZeppelin/openzeppelin-contracts@4.3.3
+
 dev_deployment_artifacts: falsev

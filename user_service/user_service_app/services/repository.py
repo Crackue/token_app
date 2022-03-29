@@ -1,7 +1,9 @@
 import logging
+import datetime
 from abc import abstractmethod
 from django.contrib.auth import authenticate
 from user_service_app.models import EtherUser
+from utils import user_utils
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,14 @@ class UserRepository:
     def get_user_address_by_name(self, request, username) -> str:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_user_contracts_by_name(self, request, username) -> tuple:
+        raise NotImplementedError
+
+    @abstractmethod
+    def set_contract_address_to_user(self, username, contract_address) -> bool:
+        raise NotImplementedError
+
 
 class UserRepositoryImpl(UserRepository):
 
@@ -46,6 +56,7 @@ class UserRepositoryImpl(UserRepository):
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 user.active_eth_address = address
+                # user.date_modified = datetime.datetime.now()
                 try:
                     user.save(update_fields=['active_eth_address'])
                     return user
@@ -104,6 +115,30 @@ class UserRepositoryImpl(UserRepository):
         except Exception as exc:
             logger.warning("User " + username + " does not exist. " + str(exc))
             return None
+
+    def get_user_contracts_by_name(self, request, username):
+        try:
+            user = EtherUser.objects.get(username=username)
+            if user is not None:
+                addresses = user.contract_addresses
+                return addresses
+            else:
+                logger.warning("User " + username + " does not exist.")
+                return None
+        except Exception as exc:
+            logger.warning("User " + username + " does not exist. " + str(exc))
+            return None
+
+    def set_contract_address_to_user(self, username, contract_address) -> bool:
+        user = user_utils.get_user(username)
+        user.contract_addresses.append(contract_address)
+        try:
+            user.save(update_fields=['contract_addresses'])
+            logger.info("Contract address " + contract_address + "was added to user " + username + " successfully")
+            return True
+        except Exception as exc:
+            logger.error(exc)
+            return False
 
 
 repository = UserRepositoryImpl()

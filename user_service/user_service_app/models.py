@@ -18,4 +18,25 @@ class EtherUser(Document):
     email = EmailField()
     eth_addresses = ListField(StringField(max_length=150, min_length=10))
     active_eth_address = StringField(max_length=150, min_length=10)
+    date_creation = DateTimeField(default=datetime.datetime.now())
     date_modified = DateTimeField(default=datetime.datetime.now())
+    contract_addresses = ListField(StringField(max_length=150, min_length=10))
+
+    def save(
+        self,
+        force_insert=False,
+        validate=True,
+        clean=True,
+        write_concern=None,
+        cascade=None,
+        cascade_kwargs=None,
+        _refs=None,
+        save_condition=None,
+        signal_kwargs=None,
+        **kwargs,
+    ):
+        self.date_modified = datetime.datetime.now()
+        super().save(
+            force_insert, validate, clean, write_concern, cascade, cascade_kwargs, _refs, save_condition,
+            signal_kwargs, **kwargs
+        )

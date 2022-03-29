@@ -3,3 +3,4 @@ __pycache__
 .hypothesis/
 reports/
 build/deployments
+.brownie

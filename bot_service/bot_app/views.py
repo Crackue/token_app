@@ -3,15 +3,20 @@ import os
 import sys
 import threading
 import logging
+
+from django.contrib.sessions.backends.cache import SessionStore
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from bot_app.handlers.onstart_handler import on_start_handler as start_handler
 from bot_app.handlers.auth_handlers import auth_handlers as auth_handler
-from bot_app.handlers.erc20_handlers import (base_handlers, transfer_handler,
+from bot_app.handlers.erc20_handlers import (balance_of_handlers, transfer_handler,
                                              approve_handler, allowance_handler,
-                                             transfer_from_handler)
-from utils import bot_request_utils as request_utils, handlers_utils as utils
+                                             transfer_from_handler, base_handlers, get_info_handler)
+from bot_app.handlers.main_menu_handlers import (on_start_menu_handler, my_contract_handler,
+                                                 on_create_contract_handler, on_interact_with_contract_handler)
+from bot_app.handlers.create_contract_handlers import erc20_handler
+from utils import bot_request_utils as request_utils, handlers_utils as utils, session_utils
 from telegram import Bot, Update
 import telegram.error
 from telegram.ext import (Updater, CommandHandler, Dispatcher)
@@ -32,16 +37,25 @@ except telegram.error.Unauthorized:
 
 
 def setup_dispatcher(dp):
-    dp.add_handler(CommandHandler("start", start_handler.command_start))
-    dp.add_handler(auth_handler.signin_conv_handler)
+    dp.add_handler(CommandHandler("start", on_start_menu_handler.command_start))
+    # dp.add_handler(auth_handler.signin_conv_handler)
     dp.add_handler(auth_handler.login_conv_handler)
     dp.add_handler(CommandHandler("logout", auth_handler.logout))
-    dp.add_handler(CommandHandler("balance", base_handlers.balance_of))
+    dp.add_handler(CommandHandler("my_contracts", my_contract_handler.get_contracts_command))
+    dp.add_handler(CommandHandler("create_contract", on_create_contract_handler.command_create_contract))
+    dp.add_handler(erc20_handler.erc20_conv_handler)
+    dp.add_handler(CommandHandler("main_menu", on_start_menu_handler.command_start))
+    dp.add_handler(on_interact_with_contract_handler.interact_with_contract_handler)
+    dp.add_handler(CommandHandler("name", base_handlers.get_contract_name))
+    dp.add_handler(CommandHandler("symbol", base_handlers.get_contract_symbol))
+    dp.add_handler(CommandHandler("decimals", base_handlers.get_contract_decimals))
+    dp.add_handler(CommandHandler("total_supply", base_handlers.get_contract_total_supply))
+    dp.add_handler(CommandHandler("balance", balance_of_handlers.balance_of))
     dp.add_handler(transfer_handler.transfer_conv_handler)
     dp.add_handler(approve_handler.approve_conv_handler)
     dp.add_handler(allowance_handler.allowance_conv_handler)
     dp.add_handler(transfer_from_handler.transfer_from_conv_handler)
-    # dp.add_handler(MessageHandler(Filters.all, all_message_handler.handle_message))
+    dp.add_handler(CommandHandler("contract_info", get_info_handler.get_contract_info))
     return dp
 
 
@@ -78,7 +92,7 @@ class TelegramBotWebhookView(View):
     # WARNING: if fail - Telegram webhook will be delivered again.
     # Can be fixed with async celery task execution
     def post(self, request, *args, **kwargs):
-        logger.info(request)
+
         # TODO add load balancer
         process_telegram_event(json.loads(request.body))
 
@@ -102,6 +116,10 @@ def process_telegram_event(update_json):
     update = Update.de_json(update_json, bot)
     if request_utils.is_bot(update):
         return
+
+    # TODO thread safety explore
+    session_utils.get_session_store(update)
+
     message = utils.convert_update_to_telegram_message(update)
     try:
         _message_ = TelegramMessage.objects(update_id=message.update_id)
