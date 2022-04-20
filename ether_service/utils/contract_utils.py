@@ -4,10 +4,10 @@ import logging
 import os
 from typing import List
 
+from brownie.exceptions import ContractNotFound
 from brownie.network.contract import _DeployedContractBase
 from django.core.exceptions import RequestAborted
 
-from ether_network import bch_connection
 from brownie import Contract, accounts
 from brownie.network.transaction import TransactionReceipt
 from ether_service.settings import BASE_DIR
@@ -80,5 +80,18 @@ def is_contract_exist(contract_owner, token_name) -> bool:
 
 def get_contract(contract_address) -> _DeployedContractBase:
     contract = Contract(contract_address)
+    return contract
+
+
+def retrieve_contract(request) -> _DeployedContractBase:
+    post = request.POST if request.POST else json.loads(request.body)
+    address_owner = post['address_owner']
+    contract_address = request.session.get(address_owner)
+    if not contract_address:
+        raise ContractNotFound("Contract was not loaded")
+    contract = get_contract(contract_address)
+    if not contract:
+        raise ContractNotFound("Contract " + contract_address + " was not found")
+    request.session[address_owner] = contract_address
     return contract
 

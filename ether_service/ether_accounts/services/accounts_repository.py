@@ -42,7 +42,7 @@ class AccountsRepository:
         raise NotImplementedError
 
     @abstractmethod
-    def is_local_account(self, request, user_address) -> bool:
+    def is_local_account(self, user_address) -> bool:
         raise NotImplementedError
 
 
@@ -103,7 +103,7 @@ class AccountsRepositoryImpl(AccountsRepository):
         else:
             return False
 
-    def is_local_account(self, request, user_address) -> bool:
+    def is_local_account(self, user_address) -> bool:
         self.bch.connect()
         try:
             account = accounts.at(user_address)

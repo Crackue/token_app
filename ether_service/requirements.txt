@@ -6,3 +6,6 @@ dnspython==2.1.0
 gunicorn==20.1.0
 pytest~=6.2.5
 redis-om==0.0.20
+celery==5.2.3
+django-celery-results==2.2.0
+flower==1.0.0

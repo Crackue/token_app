@@ -15,7 +15,7 @@ from mongoengine import connect
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = Env(DEBUG=(bool, False))
+env = Env()
 
 BASE_DIR = root
 
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -175,3 +176,12 @@ CACHES = {
 
 BOT_TOKEN = env('BOT_TOKEN')
 WEB_HOOK_URL = env('WEB_HOOK_URL')
+
+# Celery base setup
+CELERY_BROKER_URL = env('REDIS_URL')
+CELERY_RESULT_BACKEND = env('REDIS_URL')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ALWAYS_EAGER = DEBUG

@@ -55,5 +55,23 @@ services:
     networks:
       - main
 
+  celery:
+    restart: always
+    build:
+      context: ./ether_service
+      dockerfile: Dockerfile
+    command: celery -A ether_service worker -l info
+    volumes:
+      - ./app:/app
+    env_file:
+      - ./.env.test
+    depends_on:
+      - etherservice
+      - userservice
+      - botservice
+      - redis
+    networks:
+      - main
+
 networks:
   main:

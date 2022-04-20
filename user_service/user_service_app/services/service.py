@@ -82,11 +82,11 @@ class UserServicesRestImpl(UserServices):
         password = "" # json_['password']
         key = post['key']
         obj = {"key": key}
-        try:
-            response = http_requests.post(ether_accounts_add_endpoint, data=obj)
-        except Exception as exc:
-            logger.exception(exc)
-            res = False, str(exc.args)
+
+        response = http_requests.post(ether_accounts_add_endpoint, data=obj)
+        if not response.status_code == 200:
+            logger.error(f"\n status code: {response.status_code} \n reason: {response.reason} \n url: {response.url} ")
+            res = False, response.reason
             return json.dumps(res)
         logger.info("Text: " + response.text + ", url: " + response.url)
         address = response.text
@@ -95,7 +95,7 @@ class UserServicesRestImpl(UserServices):
             if not address == address_owner:
                 res = False, "This key no corresponds to user. Check your key."
                 return json.dumps(res)
-            user = self.repository.login(request, username, password, address, True)
+            user = self.repository.login(request, username, password, address_owner, True)
             res = True, user.to_json()
         else:
             res = False, "address for user: " + username + " not found. Probably should to be signed in"
