@@ -44,7 +44,7 @@ class TokenServiceImpl(TokenService):
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
         contract_address = request.session.get(address_owner)
-        response = total_supply.s(contract_address).on_error(error_handler.s()).apply_async()
+        response = total_supply.s(address_owner, contract_address).on_error(error_handler.s()).apply_async()
         return response.get()
 
     def balance_of(self, request=None):

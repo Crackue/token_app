@@ -52,7 +52,7 @@ class AccountsRepositoryImpl(AccountsRepository):
         self.bch = bch_connection.bch_connection
 
     def add(self, key: str) -> str:
-        self.bch.connect()
+        # self.bch.connect()
         try:
             account = accounts.add(key)
             if not isinstance(account, LocalAccount):

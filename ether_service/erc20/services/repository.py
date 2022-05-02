@@ -16,7 +16,7 @@ class TokenRepository(ERC_20, ABC):
 
     def __init__(self):
         self.bch = bch_connection.bch_connection
-        self.bch.connect()
+        # self.bch.connect()
 
     @abstractmethod
     def base_contract_info(self, contract=None):

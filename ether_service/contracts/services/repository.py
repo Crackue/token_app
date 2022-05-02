@@ -24,9 +24,6 @@ class ContractRepository(ABC):
 
     def __init__(self):
         self.bch = bch_connection.bch_connection
-        self.bch.connect()
-        projects_list = project.get_loaded_projects()
-        self._project_ = projects_list[0]
 
     @abstractmethod
     def deploy(self, address_owner, token_name, token_symbol, token_supply_val):
@@ -43,10 +40,14 @@ class ContractRepository(ABC):
 
 class ContractRepositoryImpl(ContractRepository):
     def deploy(self, address_owner, token_name, token_symbol, token_supply_val, key_wallet):
+
+        self.bch.connect()
+        projects_list = project.get_loaded_projects()
+        _project_ = projects_list[0]
+
         if key_wallet:
             address_owner = _repository_.add(key_wallet)
-        erc20token = self._project_[ERC20_CONTRACT_NAME]
-        contract_utils.is_contract_exist(address_owner, token_name)
+        erc20token = _project_[ERC20_CONTRACT_NAME]
         try:
             contract = erc20token.deploy(token_supply_val, token_name, token_symbol,
                                          {'from': address_owner}, publish_source=True)
@@ -75,20 +76,23 @@ class ContractRepositoryImpl(ContractRepository):
             raise Http404("No MyModel matches the given query.")
         return contract
 
-    def load_contract(self, contract_address=None, address_owner=None) -> _DeployedContractBase:
+    def load_contract(self, contract_address=None, address_owner=None) -> str:
+
+        self.bch.connect()
+
         contract = None
         try:
-            contract = Contract('alias_' + address_owner)
+            contract = Contract(f'alias_{address_owner}')
         except ValueError as err:
             logger.error(str(err.args))
         if not contract:
             try:
                 contract = Contract.from_explorer(contract_address)
-                user_address_0x = 'alias_' + address_owner
+                user_address_0x = f'alias_{address_owner}'
                 contract.set_alias(user_address_0x)
             except Exception as exc:
                 logger.exception(str(exc.args))
-        return contract
+        return contract.address
 
 
 repository = ContractRepositoryImpl()

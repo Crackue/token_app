@@ -7,7 +7,7 @@ from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, Conve
 from bot_app.models import TelegramMessage
 from utils.base_utils import amount_validate
 from constants import url_constants
-from utils import base_utils, session_utils
+from utils import base_utils, session_utils, bot_request_utils
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,6 @@ def get_value(update: Update, context: CallbackContext):
         return VALUE
 
     name_recipient = dto['name_recipient']
-    member = bot_request_utils.is_chat_member(update, name_recipient)
     address_to = base_utils.get_user_address_by_name(name_recipient)
     if not address_to[0]:
         update.message.reply_text(address_to[1])

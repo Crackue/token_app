@@ -4,7 +4,9 @@
 build:
   docker:
     web: Dockerfile
+    worker: Dockerfile
 #  config:
 #    SECRET_KEY: ruk5yikh=#+jf+ko9w+s-*4$hoi0x_um_860^q!8v^h#=8v2=v
 run:
   web: gunicorn ether_service.wsgi:application --bind 0.0.0.0:$PORT
+  worker: celery worker --app=ether_service.celery

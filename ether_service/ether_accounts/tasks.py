@@ -5,7 +5,7 @@ from ether_accounts.services.accounts_repository import repository
 logger = logging.getLogger('celery')
 
 
-@shared_task(name="add")
+@shared_task(name="add", time_limit=10)
 def add(key: str):
     return repository.add(key)
 

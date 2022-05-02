@@ -15,6 +15,9 @@ from contracts.models import ContractModel
 
 logger = logging.getLogger(__name__)
 ERC20_CONTRACT_NAME = os.getenv('ERC20_CONTRACT_NAME')
+LOCAL_DB = 'local_db'
+ABI = 'abi'
+EXPLORER = 'explorer'
 
 
 def get_contract_abi(contract_name: str):
@@ -40,6 +43,15 @@ def get_contract_from_abi(owner_address, contract_address) -> Contract:
     try:
         contract_json = get_contract_abi(ERC20_CONTRACT_NAME)
         _contract_ = load_contract_from_abi(owner_address, contract_address, contract_json)
+        return _contract_
+    except Exception as exc:
+        raise RequestAborted(str(exc.args))
+
+
+def get_contract_from_explorer(owner_address, contract_address) -> Contract:
+    try:
+        _account_owner_ = accounts.at(owner_address, True)
+        _contract_ = Contract.from_explorer(contract_address, None, _account_owner_)
         return _contract_
     except Exception as exc:
         raise RequestAborted(str(exc.args))
@@ -78,9 +90,24 @@ def is_contract_exist(contract_owner, token_name) -> bool:
     return contracts.count() > 0
 
 
-def get_contract(contract_address) -> _DeployedContractBase:
+def get_contract_from_local_db(contract_address) -> _DeployedContractBase:
     contract = Contract(contract_address)
     return contract
+
+
+def get_contract(owner_address, contract_address, source: str) -> _DeployedContractBase:
+    _contract_ = Contract(f'alias_{owner_address}')
+    if not _contract_:
+        if source == LOCAL_DB:
+            _contract_ = Contract(contract_address)
+        elif source == ABI:
+            _contract_ = get_contract_from_abi(owner_address, contract_address)
+        elif source == EXPLORER:
+            _contract_ = get_contract_from_explorer(owner_address, contract_address)
+        user_address_0x = f'alias_{owner_address}'
+        _contract_.set_alias(user_address_0x)
+        return _contract_
+    return _contract_
 
 
 def retrieve_contract(request) -> _DeployedContractBase:
@@ -89,9 +116,8 @@ def retrieve_contract(request) -> _DeployedContractBase:
     contract_address = request.session.get(address_owner)
     if not contract_address:
         raise ContractNotFound("Contract was not loaded")
-    contract = get_contract(contract_address)
+    contract = get_contract_from_local_db(contract_address)
     if not contract:
         raise ContractNotFound("Contract " + contract_address + " was not found")
     request.session[address_owner] = contract_address
     return contract
-

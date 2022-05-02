@@ -73,5 +73,25 @@ services:
     networks:
       - main
 
+  flower:
+    build:
+      context: ./ether_service
+      dockerfile: Dockerfile
+    image: django_celery_example_celery_flower
+    command: celery -A ether_service flower
+    volumes:
+      - ./app:/app
+    env_file:
+      - ./.env.test
+    ports:
+      - 5557:5555
+    depends_on:
+      - etherservice
+      - userservice
+      - botservice
+      - redis
+    networks:
+      - main
+
 networks:
   main:
