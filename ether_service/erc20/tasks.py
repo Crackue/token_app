@@ -7,20 +7,20 @@ logger = logging.getLogger('celery')
 
 
 @shared_task(name="name", time_limit=10)
-def name(contract_address):
-    contract = contract_utils.get_contract(None, contract_address, contract_utils.LOCAL_DB)
+def name(address_owner, contract_address):
+    contract = contract_utils.get_contract(address_owner, contract_address, contract_utils.LOCAL_DB)
     return repository.name(contract)
 
 
 @shared_task(name="symbol", time_limit=10)
-def symbol(contract_address):
-    contract = contract_utils.get_contract(None, contract_address, contract_utils.LOCAL_DB)
+def symbol(address_owner, contract_address):
+    contract = contract_utils.get_contract(address_owner, contract_address, contract_utils.LOCAL_DB)
     return repository.symbol(contract)
 
 
 @shared_task(name="decimals", time_limit=10)
-def decimals(contract_address):
-    contract = contract_utils.get_contract(None, contract_address, contract_utils.LOCAL_DB)
+def decimals(address_owner, contract_address):
+    contract = contract_utils.get_contract(address_owner, contract_address, contract_utils.LOCAL_DB)
     return repository.decimals(contract)
 
 
@@ -69,11 +69,12 @@ def allowance(contract_address, address_owner, address_spender):
 
 
 @shared_task(name="base_contract_info", time_limit=10)
-def base_contract_info(contract_address):
-    contract = contract_utils.get_contract(None, contract_address, contract_utils.LOCAL_DB)
+def base_contract_info(address_owner, contract_address):
+    contract = contract_utils.get_contract(address_owner, contract_address, contract_utils.LOCAL_DB)
     return repository.base_contract_info(contract)
 
 
 @shared_task(name="error_handler")
 def error_handler(request, exc, traceback):
+
     logger.error(f"Task {request.id} raised exception: {exc}", exc_info=traceback)

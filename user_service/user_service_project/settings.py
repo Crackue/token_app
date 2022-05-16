@@ -152,6 +152,7 @@ LOGGING = {
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_COOKIE_AGE = 5*60
+SESSION_SAVE_EVERY_REQUEST = True
 
 CACHES = {
     'default': {

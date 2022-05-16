@@ -12,7 +12,6 @@ from utils import contract_utils, transaction_utils, base_utils
 from ether_accounts.services import accounts_repository
 from ether_service.settings import ERC20_CONTRACT_NAME
 from contracts.models import ContractModel
-from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
 _repository_ = accounts_repository.repository
@@ -77,21 +76,8 @@ class ContractRepositoryImpl(ContractRepository):
         return contract
 
     def load_contract(self, contract_address=None, address_owner=None) -> str:
-
         self.bch.connect()
-
-        contract = None
-        try:
-            contract = Contract(f'alias_{address_owner}')
-        except ValueError as err:
-            logger.error(str(err.args))
-        if not contract:
-            try:
-                contract = Contract.from_explorer(contract_address)
-                user_address_0x = f'alias_{address_owner}'
-                contract.set_alias(user_address_0x)
-            except Exception as exc:
-                logger.exception(str(exc.args))
+        contract = contract_utils.get_contract(address_owner, contract_address, contract_utils.EXPLORER)
         return contract.address
 
 

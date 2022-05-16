@@ -2,7 +2,6 @@ import json
 import logging
 from abc import ABC, abstractmethod
 
-from brownie import project
 from utils import base_utils, contract_utils
 from brownie.exceptions import ContractExists
 from contracts.tasks import deploy, load_contract, contract_by_address, error_handler
@@ -35,9 +34,9 @@ class ContractServicesImpl(ContractServices):
         if contract_utils.is_contract_exist(address_owner, token_name):
             raise ContractExists("Contract of owner " + address_owner + " with name " + token_name + " is already exist")
         token_supply_val = base_utils.get_num_with_decimals(token_supply, 18)
-        token_info = deploy.s(address_owner, token_name, token_symbol, token_supply_val, key_wallet)\
+        task_id = deploy.s(address_owner, token_name, token_symbol, token_supply_val, key_wallet)\
             .on_error(error_handler.s()).apply_async()
-        return token_info
+        return json.dumps(str(task_id))
 
     def contract_by_address(self, request):
         post = request.POST if request.POST else json.loads(request.body)

@@ -7,7 +7,9 @@ logger = logging.getLogger('celery')
 
 @shared_task(name="deploy", ignore_result=True)
 def deploy(address_owner, token_name, token_symbol, token_supply_val, key_wallet):
-    repository.deploy(address_owner, token_name, token_symbol, token_supply_val, key_wallet)
+    tx_event = repository.deploy(address_owner, token_name, token_symbol, token_supply_val, key_wallet)
+    logger.info(f"tx_event: {tx_event}")
+    return tx_event
 
 
 @shared_task(name="contract_by_address", time_limit=10)

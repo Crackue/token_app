@@ -52,7 +52,6 @@ class AccountsRepositoryImpl(AccountsRepository):
         self.bch = bch_connection.bch_connection
 
     def add(self, key: str) -> str:
-        # self.bch.connect()
         try:
             account = accounts.add(key)
             if not isinstance(account, LocalAccount):
@@ -86,7 +85,6 @@ class AccountsRepositoryImpl(AccountsRepository):
         pass
 
     def remove(self, user_address) -> bool:
-        self.bch.connect()
         account = accounts.at(user_address)
         if accounts.__contains__(account):
             accounts.remove(account)
@@ -104,7 +102,6 @@ class AccountsRepositoryImpl(AccountsRepository):
             return False
 
     def is_local_account(self, user_address) -> bool:
-        self.bch.connect()
         try:
             account = accounts.at(user_address)
             if not isinstance(account, LocalAccount):

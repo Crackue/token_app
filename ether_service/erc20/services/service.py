@@ -23,21 +23,21 @@ class TokenServiceImpl(TokenService):
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
         contract_address = request.session.get(address_owner)
-        response = name.s(contract_address).on_error(error_handler.s()).apply_async()
+        response = name.s(address_owner, contract_address).on_error(error_handler.s()).apply_async()
         return response.get()
 
     def symbol(self, request=None) -> str:
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
         contract_address = request.session.get(address_owner)
-        response = symbol.s(contract_address).on_error(error_handler.s()).apply_async()
+        response = symbol.s(address_owner, contract_address).on_error(error_handler.s()).apply_async()
         return response.get()
 
     def decimals(self, request=None) -> int:
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
         contract_address = request.session.get(address_owner)
-        response = decimals.s(contract_address).on_error(error_handler.s()).apply_async()
+        response = decimals.s(address_owner, contract_address).on_error(error_handler.s()).apply_async()
         return response.get()
 
     def total_supply(self, request=None) -> int:
@@ -106,7 +106,7 @@ class TokenServiceImpl(TokenService):
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post["address_owner"]
         contract_address = request.session.get(address_owner)
-        response = base_contract_info.s(contract_address).on_error(error_handler.s()).apply_async()
+        response = base_contract_info.s(address_owner, contract_address).on_error(error_handler.s()).apply_async()
         info = response.get()
 
         _total_supply_ = info['total_supply']

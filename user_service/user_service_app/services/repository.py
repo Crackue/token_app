@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class UserRepository:
 
     @abstractmethod
-    def signin(self, request) -> bool:
+    def signin(self, request) -> EtherUser:
         raise NotImplementedError
 
     @abstractmethod
@@ -41,13 +41,13 @@ class UserRepository:
 
 class UserRepositoryImpl(UserRepository):
 
-    def signin(self, user: EtherUser) -> tuple:
+    def signin(self, user: EtherUser) -> EtherUser:
         try:
             user.save()
-            return True, user
+            return user
         except Exception as exc:
             logger.error(exc)
-            return False, exc.args
+            return None
 
     def login(self, request, username, password, address, check_pass: bool) -> EtherUser:
 

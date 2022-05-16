@@ -22,7 +22,7 @@ services:
     container_name: ether-service
     build:
       context: ./ether_service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.web
     depends_on:
       - botservice
       - redis
@@ -59,7 +59,7 @@ services:
     restart: always
     build:
       context: ./ether_service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.worker
     command: celery -A ether_service worker -l info
     volumes:
       - ./app:/app
@@ -76,7 +76,7 @@ services:
   flower:
     build:
       context: ./ether_service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.worker
     image: django_celery_example_celery_flower
     command: celery -A ether_service flower
     volumes:

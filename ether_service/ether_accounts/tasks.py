@@ -2,10 +2,10 @@ import logging
 from celery import shared_task
 from ether_accounts.services.accounts_repository import repository
 
-logger = logging.getLogger('celery')
+logger = logging.getLogger(__name__)
 
 
-@shared_task(name="add", time_limit=10)
+@shared_task(name="add", time_limit=30)
 def add(key: str):
     return repository.add(key)
 

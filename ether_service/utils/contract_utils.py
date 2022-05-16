@@ -39,9 +39,9 @@ def load_contract_from_abi(owner_address, contract_address, contract_json):
     return contract_
 
 
-def get_contract_from_abi(owner_address, contract_address) -> Contract:
+def get_contract_from_abi(owner_address, contract_address, contract_name) -> Contract:
     try:
-        contract_json = get_contract_abi(ERC20_CONTRACT_NAME)
+        contract_json = get_contract_abi(contract_name)
         _contract_ = load_contract_from_abi(owner_address, contract_address, contract_json)
         return _contract_
     except Exception as exc:
@@ -100,8 +100,6 @@ def get_contract(owner_address, contract_address, source: str) -> _DeployedContr
     if not _contract_:
         if source == LOCAL_DB:
             _contract_ = Contract(contract_address)
-        elif source == ABI:
-            _contract_ = get_contract_from_abi(owner_address, contract_address)
         elif source == EXPLORER:
             _contract_ = get_contract_from_explorer(owner_address, contract_address)
         user_address_0x = f'alias_{owner_address}'
