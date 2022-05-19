@@ -14,7 +14,14 @@ def deploy(address_owner, token_name, token_symbol, token_supply_val, key_wallet
 
 @shared_task(name="contract_by_address", time_limit=10)
 def contract_by_address(contract_address):
-    return repository.contract_by_address(contract_address)
+    contract = repository.contract_by_address(contract_address).to_json()
+    return contract
+
+
+@shared_task(name="contracts_by_owner", time_limit=10)
+def contracts_by_owner(contract_owner):
+    contract = repository.contracts_by_owner(contract_owner)
+    return contract
 
 
 @shared_task(name="load_contract", time_limit=60)

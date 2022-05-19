@@ -3,6 +3,7 @@ mongoengine==0.23.1
 django-environ==0.8.1
 environ==1.0
 dnspython==2.1.0
+requests~=2.26.0
 gunicorn==20.1.0
 pytest~=6.2.5
 redis-om==0.0.20

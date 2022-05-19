@@ -41,14 +41,17 @@ ether_erc20_transfer_from_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_tran
 contract_base = "contract/"
 contract_deploy = "deploy/"
 contract_by_address = "contract_by_address/"
+contracts_by_owner = "contracts_by_owner/"
 load_contract = "load_contract/"
 
 path_deploy = contract_base + contract_deploy
 path_contract_by_address = contract_base + contract_by_address
+path_contract_by_owner = contract_base + contracts_by_owner
 path_load_contract = contract_base + load_contract
 
 contract_deploy_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_deploy, "", ""))
 contract_by_address_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_contract_by_address, "", ""))
+contract_by_owner_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_contract_by_owner, "", ""))
 load_contract_endpoint = urlunsplit((SCHEME, ETHER_NETLOC, path_load_contract, "", ""))
 
 NETLOC = USER_SERVICE_HOST + ":" + USER_PORT if SCHEME == "http" else USER_SERVICE_HOST
@@ -58,18 +61,21 @@ user_service_login = "login/"
 user_service_logout = "logout/"
 user_service_signin = "signin/"
 user_service_update_user = "update_user/"
+user_service_get_user_by_name = "get_user_by_name/"
 user_service_get_contracts = "get_contracts/"
 
 path_login = user_service_base + user_service_login
 path_logout = user_service_base + user_service_logout
 path_signin = user_service_base + user_service_signin
 path_update_user = user_service_base + user_service_update_user
+path_get_user_by_name = user_service_base + user_service_get_user_by_name
 path_get_contracts = user_service_base + user_service_get_contracts
 
 user_service_login_endpoint = urlunsplit((SCHEME, NETLOC, path_login, "", ""))
 user_service_logout_endpoint = urlunsplit((SCHEME, NETLOC, path_logout, "", ""))
 user_service_signin_endpoint = urlunsplit((SCHEME, NETLOC, path_signin, "", ""))
 user_service_update_user_endpoint = urlunsplit((SCHEME, NETLOC, path_update_user, "", ""))
+user_service_get_user_by_name_endpoint = urlunsplit((SCHEME, NETLOC, path_get_user_by_name, "", ""))
 user_service_get_contracts_endpoint = urlunsplit((SCHEME, NETLOC, path_get_contracts, "", ""))
 
 

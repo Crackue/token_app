@@ -1,8 +1,10 @@
+import json
 import logging
+
+import requests
 from abc import ABC, abstractmethod
 from brownie import accounts, project
 from brownie.exceptions import RPCRequestError
-from brownie.network.contract import ProjectContract, Contract, _DeployedContractBase
 from brownie.project.main import Project
 from django.http import Http404
 from mongoengine import DoesNotExist, OperationError
@@ -33,6 +35,10 @@ class ContractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def contracts_by_owner(self, contract_owner=None):
+        raise NotImplementedError
+
+    @abstractmethod
     def load_contract(self, contract_address=None, address_owner=None):
         raise NotImplementedError
 
@@ -60,6 +66,11 @@ class ContractRepositoryImpl(ContractRepository):
         _contract_ = contract_utils.contract_handler(contract.tx, address_owner, token_name, token_symbol,
                                                      token_supple, token_functions)
 
+        # obj = {"username": "", "address_owner": address_owner, "contract_address": _contract_.contract_address}
+        # response = requests.post(url_constants.user_service_update_user_endpoint, data=obj)
+        # if not response.status_code == 200:
+        #     raise Exception()
+
         try:
             transaction.save()
             _contract_.save()
@@ -74,6 +85,16 @@ class ContractRepositoryImpl(ContractRepository):
         except DoesNotExist:
             raise Http404("No MyModel matches the given query.")
         return contract
+
+    def contracts_by_owner(self, contract_owner=None) -> list:
+        contract_addresses_list = list()
+        try:
+            contracts = ContractModel.objects.filter(contract_owner=contract_owner)
+            for contract in contracts:
+                contract_addresses_list.append(contract.contract_address)
+        except DoesNotExist:
+            raise Http404("No MyModel matches the given query.")
+        return json.dumps(contract_addresses_list)
 
     def load_contract(self, contract_address=None, address_owner=None) -> str:
         self.bch.connect()

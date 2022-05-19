@@ -139,6 +139,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+CELERYD_HIJACK_ROOT_LOGGER = False
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -157,11 +158,23 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
+        'celery_handler': {
+            'level': 'INFO',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        }
     },
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
     },
+    'loggers': {
+        'celery': {
+            'handlers': ['celery_handler', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    }
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'

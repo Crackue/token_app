@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from utils import base_utils, contract_utils
 from brownie.exceptions import ContractExists
-from contracts.tasks import deploy, load_contract, contract_by_address, error_handler
+from contracts.tasks import deploy, load_contract, contract_by_address, contracts_by_owner, error_handler
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,10 @@ class ContractServices(ABC):
 
     @abstractmethod
     def contract_by_address(self, request):
+        raise NotImplementedError
+
+    @abstractmethod
+    def contracts_by_owner(self, request):
         raise NotImplementedError
 
     @abstractmethod
@@ -42,7 +46,13 @@ class ContractServicesImpl(ContractServices):
         post = request.POST if request.POST else json.loads(request.body)
         contract_address = post["contract_address"]
         contract = contract_by_address.s(contract_address).on_error(error_handler.s()).apply_async()
-        return contract.get().to_json()
+        return contract.get()
+
+    def contracts_by_owner(self, request):
+        post = request.POST if request.POST else json.loads(request.body)
+        contract_owner = post["contract_owner"]
+        contract = contracts_by_owner.s(contract_owner).on_error(error_handler.s()).apply_async()
+        return contract.get()
 
     def load_contract(self, request):
         post = request.POST if request.POST else json.loads(request.body)

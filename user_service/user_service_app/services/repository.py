@@ -53,6 +53,8 @@ class UserRepositoryImpl(UserRepository):
 
         if check_pass:
             # TODO add password validation
+            old_user = user_utils.get_user_by_active_address(address)
+            old_user.save(active_eth_address=None)
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 user.active_eth_address = address
@@ -67,6 +69,8 @@ class UserRepositoryImpl(UserRepository):
             else:
                 return None
         else:
+            old_user = user_utils.get_user_by_active_address(address)
+            old_user.save(active_eth_address=None)
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 user.active_eth_address = address
@@ -107,8 +111,8 @@ class UserRepositoryImpl(UserRepository):
         try:
             user = EtherUser.objects.get(username=username)
             if user is not None:
-                addresses = user.eth_addresses
-                return addresses[0]
+                address = user.active_eth_address
+                return address
             else:
                 logger.warning("User " + username + " does not exist.")
                 return None
@@ -129,8 +133,11 @@ class UserRepositoryImpl(UserRepository):
             logger.warning("User " + username + " does not exist. " + str(exc))
             return None
 
-    def set_contract_address_to_user(self, username, contract_address) -> bool:
-        user = user_utils.get_user(username)
+    def set_contract_address_to_user(self, username=None, active_eth_address=None, contract_address=None) -> bool:
+        if username:
+            user = user_utils.get_user_by_name(username)
+        else:
+            user = user_utils.get_user_by_active_address(active_eth_address)
         user.contract_addresses.append(contract_address)
         try:
             user.save(update_fields=['contract_addresses'])

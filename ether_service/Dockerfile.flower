@@ -22,4 +22,4 @@ RUN pip3 install --upgrade certifi
 RUN pip3 install eth-brownie
 RUN pip3 install -r requirements.txt
 COPY . $APP_HOME
-CMD celery -A ether_service flower
+CMD celery -A ether_service.celery worker -l INFO

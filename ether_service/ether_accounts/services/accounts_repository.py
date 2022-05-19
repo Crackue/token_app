@@ -52,18 +52,13 @@ class AccountsRepositoryImpl(AccountsRepository):
         self.bch = bch_connection.bch_connection
 
     def add(self, key: str) -> str:
-        try:
+        self.bch.connect()
+        account = accounts.add(key)
+        if not isinstance(account, LocalAccount):
+            accounts.remove(account)
             account = accounts.add(key)
-            if not isinstance(account, LocalAccount):
-                accounts.remove(account)
-                account = accounts.add(key)
-                logger.info(accounts.__dict__)
-                return account.address
-        except Exception as exc:
-            logger.error(exc)
-            return None
-        logger.info(accounts.__dict__)
-        return account.address
+            logger.info(accounts.__dict__)
+            return account.address
 
     def at(self):
         pass

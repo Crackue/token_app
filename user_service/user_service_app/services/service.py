@@ -92,7 +92,8 @@ class UserServicesRestImpl(UserServices):
                 return json.dumps(res)
             logger.info("Text: " + response.text + ", url: " + response.url)
             address = response.text
-            request.session[username] = address
+            if not address and not address == 'None':
+                request.session[username] = address
 
         if address is not None:
             if not address == address_owner:
@@ -158,9 +159,10 @@ class UserServicesRestImpl(UserServices):
     def update_user(self, request) -> bool:
         post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
+        active_eth_address = post['active_eth_address']
         # TODO set delegation according to field
         contract_address = post['contract_address']
-        response = self.repository.set_contract_address_to_user(username, contract_address)
+        response = self.repository.set_contract_address_to_user(username, active_eth_address, contract_address)
         return response
 
 

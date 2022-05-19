@@ -4,11 +4,9 @@ import sys
 import threading
 import logging
 
-from django.contrib.sessions.backends.cache import SessionStore
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from bot_app.handlers.onstart_handler import on_start_handler as start_handler
 from bot_app.handlers.auth_handlers import auth_handlers as auth_handler
 from bot_app.handlers.erc20_handlers import (balance_of_handlers, transfer_handler,
                                              approve_handler, allowance_handler,
@@ -16,15 +14,16 @@ from bot_app.handlers.erc20_handlers import (balance_of_handlers, transfer_handl
 from bot_app.handlers.main_menu_handlers import (on_start_menu_handler, my_contract_handler,
                                                  on_create_contract_handler, on_interact_with_contract_handler)
 from bot_app.handlers.create_contract_handlers import erc20_handler
+from bot_service.settings import env
 from utils import bot_request_utils as request_utils, handlers_utils as utils, session_utils
 from telegram import Bot, Update
 import telegram.error
 from telegram.ext import (Updater, CommandHandler, Dispatcher)
-
 from bot_app.models import TelegramMessage
+from bot_app import tasks
 
 logger = logging.getLogger(__name__)
-DEBUG = bool(os.getenv('DEBUG'))
+DEBUG = env('DEBUG')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 TELEGRAM_URL = os.getenv('TELEGRAM_URL')
 WEB_HOOK_URL = os.getenv('WEB_HOOK_URL')
@@ -96,7 +95,7 @@ class TelegramBotWebhookView(View):
         # TODO add load balancer
         process_telegram_event(json.loads(request.body))
 
-        # if DEBUG:
+        # if DEBUG == 'True':
         #     process_telegram_event(json.loads(request.body))
         # else:
         #     # TODO CELERY
@@ -104,7 +103,7 @@ class TelegramBotWebhookView(View):
         #     # Don't forget to run it and & Redis (message broker for Celery)!
         #     # Read Procfile for details
         #     # You can run all of these services via docker-compose.yml
-        #     process_telegram_event.delay(json.loads(request.body))
+        #     tasks.process_telegram_event.s(json.loads(request.body)).on_error(tasks.error_handler.s()).apply_async()
 
         return JsonResponse({"ok": "POST request processed"})
 
