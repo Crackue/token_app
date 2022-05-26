@@ -15,11 +15,11 @@ def get_user_by_name(username):
     return user
 
 
-def get_user_by_active_address(active_eth_address) -> EtherUser:
+def get_user_by_active_address(active_eth_address):
     try:
         users = EtherUser.objects.filter(active_eth_address=active_eth_address)
         # TODO add warning if users > 1
     except DoesNotExist as exc:
         logger.exception(str(exc.args))
         return None
-    return users[0]
+    return users

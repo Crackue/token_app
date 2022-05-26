@@ -59,6 +59,7 @@ class AccountsRepositoryImpl(AccountsRepository):
             account = accounts.add(key)
             logger.info(accounts.__dict__)
             return account.address
+        return account.address
 
     def at(self):
         pass

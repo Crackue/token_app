@@ -54,7 +54,8 @@ class UserRepositoryImpl(UserRepository):
         if check_pass:
             # TODO add password validation
             old_user = user_utils.get_user_by_active_address(address)
-            old_user.save(active_eth_address=None)
+            if old_user:
+                old_user[0].save(active_eth_address=None)
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 user.active_eth_address = address
@@ -70,7 +71,8 @@ class UserRepositoryImpl(UserRepository):
                 return None
         else:
             old_user = user_utils.get_user_by_active_address(address)
-            old_user.save(active_eth_address=None)
+            if old_user:
+                old_user[0].save(active_eth_address=None)
             user = authenticate(request=request, username=username, password=password)
             if user is not None:
                 user.active_eth_address = address
