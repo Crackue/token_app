@@ -3,8 +3,16 @@
 #    env_file: .env.dev
 build:
   docker:
-    web: Dockerfile
+    web: Dockerfile.web
+    worker: Dockerfile.worker
 #  config:
 #    SECRET_KEY: ruk5yikh=#+jf+ko9w+s-*4$hoi0x_um_860^q!8v^h#=8v2=v
 run:
-  web: gunicorn bot_service.wsgi:application --bind 0.0.0.0:$PORT
+  web:
+    command:
+      - gunicorn bot_service.wsgi:application --bind 0.0.0.0:$PORT
+    image: web
+  worker:
+    command:
+      - celery worker --app=bot_service.celery -l info
+    image: worker

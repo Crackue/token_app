@@ -1,12 +1,15 @@
+import logging
 from abc import abstractmethod
 import json
-from ether_accounts.services import accounts_repository
+from ether_accounts.tasks import add, remove, clear, is_local_account, error_handler
+
+logger = logging.getLogger(__name__)
 
 
 class AccountsServices:
 
     @abstractmethod
-    def add(self, request, key: str) -> bool:
+    def add(self, request) -> bool:
         raise NotImplementedError
 
     @abstractmethod
@@ -44,13 +47,11 @@ class AccountsServices:
 
 class AccountsServicesImpl(AccountsServices):
 
-    def __init__(self):
-        self.repository = accounts_repository.repository
-
     def add(self, request) -> str:
         post = request.POST if request.POST else json.loads(request.body)
         key = post["key"]
-        return self.repository.add(key)
+        response = add.s(key).on_error(error_handler.s()).apply_async()
+        return response.get()
 
     def at(self):
         # TODO
@@ -73,17 +74,18 @@ class AccountsServicesImpl(AccountsServices):
         pass
 
     def remove(self, user_address):
-        return self.repository.remove(user_address)
+        response = remove.s(user_address).on_error(error_handler.s()).apply_async()
+        return response.get()
 
     def clear(self) -> bool:
-        res = self.repository.clear()
-        return res
+        response = clear.s().on_error(error_handler.s()).apply_async()
+        return response.get()
 
     def is_local_account(self, request) -> bool:
         post = request.POST if request.POST else json.loads(request.body)
         user_address = post['user_address']
-        res = self.repository.is_local_account(request, user_address)
-        return res
+        response = is_local_account.s(user_address).on_error(error_handler.s()).apply_async()
+        return response.get()
 
 
 service = AccountsServicesImpl()

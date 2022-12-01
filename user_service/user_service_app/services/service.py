@@ -82,23 +82,33 @@ class UserServicesRestImpl(UserServices):
         password = "" # json_['password']
         key = post['key']
         obj = {"key": key}
-        try:
+
+        address = request.session.get(username)
+        if not address:
             response = http_requests.post(ether_accounts_add_endpoint, data=obj)
-        except Exception as exc:
-            logger.exception(exc)
-            res = False, str(exc.args)
-            return json.dumps(res)
-        logger.info("Text: " + response.text + ", url: " + response.url)
-        address = response.text
+            if not response.status_code == 200:
+                logger.error(f"\n status code: {response.status_code} \n reason: {response.reason} \n url: {response.url} ")
+                res = False, response.reason
+                return json.dumps(res)
+            logger.info("Text: " + response.text + ", url: " + response.url)
+            address = response.text
+            if not address and not address == 'None':
+                request.session[username] = address
 
         if address is not None:
             if not address == address_owner:
                 res = False, "This key no corresponds to user. Check your key."
                 return json.dumps(res)
-            user = self.repository.login(request, username, password, address, True)
-            res = True, user.to_json()
+            user = self.repository.login(request, username, password, address_owner, True)
+            if not user:
+                user = EtherUser()
+                user.username = username
+                user.eth_addresses = address
+                res = True, self.repository.signin(user).to_json()
+            else:
+                res = True, user.to_json()
         else:
-            res = False, "address for user: " + username + " not found. Probably should to be signed in"
+            res = False, "address for user: " + username + " not found."
         return json.dumps(res)
 
     def logout(self, request):
@@ -129,9 +139,9 @@ class UserServicesRestImpl(UserServices):
         except Exception as exc:
             logger.exception(exc)
             return False
-        db_response = self.repository.is_logged_in(request, user_address)
+        # db_response = self.repository.is_logged_in(request, user_address)
 
-        return True if ether_response and db_response else False
+        return ether_response
 
     def get_user_address_by_name(self, request) -> str:
         post = request.POST if request.POST else json.loads(request.body)
@@ -149,9 +159,10 @@ class UserServicesRestImpl(UserServices):
     def update_user(self, request) -> bool:
         post = request.POST if request.POST else json.loads(request.body)
         username = post['username']
+        active_eth_address = post['active_eth_address']
         # TODO set delegation according to field
         contract_address = post['contract_address']
-        response = self.repository.set_contract_address_to_user(username, contract_address)
+        response = self.repository.set_contract_address_to_user(username, active_eth_address, contract_address)
         return response
 
 

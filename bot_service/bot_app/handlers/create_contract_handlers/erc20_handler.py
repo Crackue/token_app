@@ -52,21 +52,10 @@ def token_supply(update: Update, context: CallbackContext):
     if isinstance(value, str):
         update.message.reply_text(value + ". Try again")
         return TOKEN_SUPPLY
-    # TODO request to deploy
     obj = {"address_owner": dto['address_owner'], "token_name": dto['token_name'],
            "token_symbol": dto['token_symbol'], "token_supply": value, "key_wallet": ""}
 
     response = requests.post(url_constants.contract_deploy_endpoint, data=obj)
-
-    if not response.status_code == 200:
-        update.message.reply_text("FAILED!!! " + response.reason)
-        return ConversationHandler.END
-
-    resp = json.loads(response.text)
-    contract_address = resp['contract_address']
-    username = update.message.from_user['username']
-    obj = {"username": username, "contract_address": contract_address}
-    requests.post(url_constants.user_service_update_user_endpoint, data=obj)
     if not response.status_code == 200:
         update.message.reply_text("FAILED!!! " + response.reason)
         return ConversationHandler.END

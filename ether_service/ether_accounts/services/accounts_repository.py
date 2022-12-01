@@ -42,7 +42,7 @@ class AccountsRepository:
         raise NotImplementedError
 
     @abstractmethod
-    def is_local_account(self, request, user_address) -> bool:
+    def is_local_account(self, user_address) -> bool:
         raise NotImplementedError
 
 
@@ -53,17 +53,12 @@ class AccountsRepositoryImpl(AccountsRepository):
 
     def add(self, key: str) -> str:
         self.bch.connect()
-        try:
+        account = accounts.add(key)
+        if not isinstance(account, LocalAccount):
+            accounts.remove(account)
             account = accounts.add(key)
-            if not isinstance(account, LocalAccount):
-                accounts.remove(account)
-                account = accounts.add(key)
-                logger.info(accounts.__dict__)
-                return account.address
-        except Exception as exc:
-            logger.error(exc)
-            return None
-        logger.info(accounts.__dict__)
+            logger.info(accounts.__dict__)
+            return account.address
         return account.address
 
     def at(self):
@@ -86,7 +81,6 @@ class AccountsRepositoryImpl(AccountsRepository):
         pass
 
     def remove(self, user_address) -> bool:
-        self.bch.connect()
         account = accounts.at(user_address)
         if accounts.__contains__(account):
             accounts.remove(account)
@@ -103,8 +97,7 @@ class AccountsRepositoryImpl(AccountsRepository):
         else:
             return False
 
-    def is_local_account(self, request, user_address) -> bool:
-        self.bch.connect()
+    def is_local_account(self, user_address) -> bool:
         try:
             account = accounts.at(user_address)
             if not isinstance(account, LocalAccount):

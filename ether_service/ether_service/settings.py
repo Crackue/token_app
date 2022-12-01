@@ -16,13 +16,10 @@ from mongoengine import connect
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = Env(
-    DEBUG=(bool, False)
-)
+env = Env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = root
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Take environment variables from .env file
 ENV_PATH = env.str('ENV_PATH')
@@ -58,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -139,6 +137,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+CELERYD_HIJACK_ROOT_LOGGER = False
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -157,11 +156,23 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
+        'celery_handler': {
+            'level': 'INFO',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        }
     },
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
     },
+    'loggers': {
+        'celery': {
+            'handlers': ['celery_handler', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    }
 }
 
 ERC20_CONTRACT_NAME = env.str('ERC20_CONTRACT_NAME')
@@ -172,6 +183,7 @@ ETHERSCAN_TOKEN = env('ETHERSCAN_TOKEN')
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_COOKIE_AGE = 5*60
+SESSION_SAVE_EVERY_REQUEST = True
 
 CACHES = {
     'default': {
@@ -179,3 +191,13 @@ CACHES = {
         'LOCATION': env('REDIS_URL'),
     }
 }
+
+# Celery base setup
+CELERY_BROKER_URL = env('REDIS_URL')
+CELERY_RESULT_BACKEND = env('REDIS_URL')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERYD_SOFT_TIME_LIMIT = (60 * 59) + 59
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ALWAYS_EAGER = DEBUG

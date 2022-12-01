@@ -1,6 +1,8 @@
+
 import logging
 import json
 import requests
+
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, MessageHandler, ConversationHandler, Filters)
 from constants import url_constants
@@ -13,7 +15,7 @@ KEY, WALLET_ADDRESS = range(2)
 
 def repeat_or_stop(update: Update, context: CallbackContext):
     _text_ = update.message['text']
-    if _text_ == 'stop':
+    if str(_text_).lower() == 'stop':
         update.message.reply_text('Buy! See you later...')
         return ConversationHandler.END
     else:

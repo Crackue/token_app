@@ -53,3 +53,9 @@ def get_contracts_by_name(request) -> HttpResponse:
 def user_update(request) -> HttpResponse:
     response = _service_.update_user(request)
     return HttpResponse(response)
+
+
+@csrf_exempt
+def start_user_service(request) -> HttpResponse:
+    logger.info("START_USER_SERVICE_REQUEST")
+    return HttpResponse("START_USER_SERVICE_RESPONSE")

@@ -24,15 +24,15 @@ class ERC_20:
         raise NotImplementedError
 
     @abstractmethod
-    def transfer(self, address_to, _value) -> bool:
+    def transfer(self, address_owner, address_to, _value) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def transfer_from(self, address_from, address_to, _value) -> bool:
+    def transfer_from(self, address_owner, address_from, address_to, _value) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def approve(self, address_spender, _value) -> bool:
+    def approve(self, address_owner, address_spender, _value) -> bool:
         raise NotImplementedError
 
     @abstractmethod

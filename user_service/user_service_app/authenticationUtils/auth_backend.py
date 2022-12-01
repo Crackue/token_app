@@ -2,12 +2,9 @@
 import logging
 
 from django.contrib.auth.backends import BaseBackend
-from django.core.exceptions import PermissionDenied
 from user_service_app.models import EtherUser
-from mongoengine.queryset.base import BaseQuerySet
 
-
-
+logger = logging.getLogger(__name__)
 
 
 class MyModelBackend(BaseBackend):

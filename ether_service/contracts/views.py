@@ -38,6 +38,24 @@ def contract_by_address(request) -> HttpResponse:
 
 
 @csrf_exempt
+def contracts_by_owner(request) -> HttpResponse:
+    try:
+        _response_ = _service_.contracts_by_owner(request)
+    except BaseException as exc:
+        return HttpResponseBadRequest(reason=exc.args)
+    return HttpResponse(_response_)
+
+
+@csrf_exempt
 def load_contract_and_set_to_cache(request) -> HttpResponse:
-    response = _service_.load_contract(request)
+    try:
+        response = _service_.load_contract(request)
+    except ValueError as err:
+        return HttpResponseBadRequest(reason=err.args)
     return HttpResponse(response)
+
+
+@csrf_exempt
+def start_ether_service(request) -> HttpResponse:
+    logger.info("START_ETHER_SERVICE_REQUEST")
+    return HttpResponse("START_ETHER_SERVICE_RESPONSE")

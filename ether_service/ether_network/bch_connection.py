@@ -3,8 +3,7 @@ import logging
 import brownie
 from abc import abstractmethod
 from pathlib import Path
-
-from ether_service.settings import BASE_DIR, CONTRACT_HOME
+from ether_service.settings import BASE_DIR, CONTRACT_HOME, ERC20_CONTRACT_NAME
 from brownie import project
 
 logger = logging.getLogger(__name__)
@@ -52,7 +51,7 @@ class BCHConnectionImpl(BCHConnection):
                 if brownie.network.is_connected():
                     logger.info("Connection to " + self.connector.server + " established successfully")
                     if not project.get_loaded_projects():
-                        project.load(brownie_config_path, "TtokenProject")
+                        project.load(brownie_config_path, ERC20_CONTRACT_NAME)
                     logger.info("Contract compilation finished successfully")
                     return True
                 else:

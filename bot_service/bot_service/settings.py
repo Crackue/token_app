@@ -15,7 +15,7 @@ from mongoengine import connect
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = Env(DEBUG=(bool, False))
+env = Env()
 
 BASE_DIR = root
 
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -138,6 +139,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+CELERYD_HIJACK_ROOT_LOGGER = False
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -156,15 +158,28 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
+        'celery_handler': {
+            'level': 'INFO',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler'
+        }
     },
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
     },
+    'loggers': {
+        'celery': {
+            'handlers': ['celery_handler', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    }
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_COOKIE_AGE = 5*60
+SESSION_SAVE_EVERY_REQUEST = True
 
 CACHES = {
     'default': {
@@ -175,3 +190,13 @@ CACHES = {
 
 BOT_TOKEN = env('BOT_TOKEN')
 WEB_HOOK_URL = env('WEB_HOOK_URL')
+
+# Celery base setup
+CELERY_BROKER_URL = env('REDIS_URL')
+CELERY_RESULT_BACKEND = env('REDIS_URL')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERYD_SOFT_TIME_LIMIT = (60 * 59) + 59
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ALWAYS_EAGER = DEBUG

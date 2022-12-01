@@ -1,7 +1,5 @@
 import logging
-
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from ether_accounts.services import accounts_services
 
@@ -11,7 +9,11 @@ _service_ = accounts_services.service
 
 @csrf_exempt
 def add(request) -> HttpResponse:
-    res = _service_.add(request)
+    try:
+        res = _service_.add(request)
+    except Exception as exc:
+        logger.exception(exc)
+        return HttpResponseBadRequest(reason=exc.args)
     return HttpResponse(res)
 
 

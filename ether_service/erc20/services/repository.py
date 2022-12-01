@@ -1,9 +1,9 @@
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
+
 from brownie import accounts
 from brownie.exceptions import RPCRequestError, UnknownAccount
 from mongoengine import OperationError
-
 from ether_network import bch_connection
 from erc20.services.ERC_20 import ERC_20
 from utils import transaction_utils
@@ -16,7 +16,11 @@ class TokenRepository(ERC_20, ABC):
 
     def __init__(self):
         self.bch = bch_connection.bch_connection
-        self.bch.connect()
+        # self.bch.connect()
+
+    @abstractmethod
+    def base_contract_info(self, contract=None):
+        raise NotImplementedError
 
 
 class TokenRepositoryImpl(TokenRepository):
@@ -56,7 +60,6 @@ class TokenRepositoryImpl(TokenRepository):
             transaction.save()
         except Exception as exc:
             raise OperationError(exc.args)
-        logger.info(tx.events)
         return str(tx.events)
 
     def transfer_from(self, address_owner, address_from, address_to, _value, contract=None) -> str:
@@ -91,9 +94,22 @@ class TokenRepositoryImpl(TokenRepository):
         return str(tx.events)
 
     def allowance(self, address_owner, address_spender, contract=None) -> str:
-        tx = contract.allowance(address_owner, address_spender)
-        logger.info(tx.events)
-        return str(tx.events)
+        try:
+            return contract.allowance(address_owner, address_spender)
+        except Exception as exc:
+            logger.exception(str(exc.args))
+            raise RPCRequestError(exc.args)
+
+    def base_contract_info(self, contract=None):
+        info = {
+            'address': contract.address,
+            'abi': contract.abi,
+            'name': contract.name(),
+            'symbol': contract.symbol(),
+            'decimals': contract.decimals(),
+            'total_supply': contract.totalSupply()
+        }
+        return info
 
 
 repository = TokenRepositoryImpl()

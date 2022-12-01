@@ -2,7 +2,7 @@ import logging
 
 from telegram.ext import CallbackContext
 from telegram.botcommandscope import BotCommandScopeChat, BotCommandScopeAllGroupChats
-from telegram import Update, BotCommand
+from telegram import Update, BotCommand, MenuButton, MenuButtonCommands
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,9 @@ def command_start(update: Update, context: CallbackContext) -> None:
     if chat_type == 'private':
         scope = BotCommandScopeChat(chat_id)
         list_commands = context.bot.get_my_commands(scope=scope)
+        mb = MenuButtonCommands()
+        context.bot.setChatMenuButton(chat_id=chat_id, menu_button=mb)
+
         if len(list_commands):
             login = BotCommand("login", "log in")
             logout = BotCommand("logout", "log out")
