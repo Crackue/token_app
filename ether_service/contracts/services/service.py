@@ -57,13 +57,13 @@ class ContractServicesImpl(ContractServices):
     def load_contract(self, request):
         post = request.POST if request.POST else json.loads(request.body)
         address_owner = post['address_owner']
-        contract_address = request.session.get(address_owner)
-        if not contract_address:
-            contract_address = post['contract_address']
-            request.session[address_owner] = contract_address
-            response = load_contract.s(contract_address, address_owner).on_error(error_handler.s()).apply_async()
+        contract_address_new = post['contract_address']
+        contract_address_old = request.session.get(address_owner)
+        if not contract_address_old or not contract_address_old == contract_address_new:
+            request.session[address_owner] = contract_address_new
+            response = load_contract.s(contract_address_new, address_owner).on_error(error_handler.s()).apply_async()
             return response.get()
-        return contract_address
+        return contract_address_old
 
 
 contractService = ContractServicesImpl()

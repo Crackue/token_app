@@ -96,14 +96,16 @@ def get_contract_from_local_db(contract_address) -> _DeployedContractBase:
 
 
 def get_contract(owner_address, contract_address, source: str) -> _DeployedContractBase:
-    _contract_ = Contract(f'alias_{owner_address}')
-    if not _contract_:
+    try:
+        _contract_ = Contract(f'alias_{contract_address}')
+    except ValueError as err:
+        logger.warning(err.args)
         if source == LOCAL_DB:
             _contract_ = Contract(contract_address)
         elif source == EXPLORER:
             _contract_ = get_contract_from_explorer(owner_address, contract_address)
-        user_address_0x = f'alias_{owner_address}'
-        _contract_.set_alias(user_address_0x)
+        address_0x = f'alias_{contract_address}'
+        _contract_.set_alias(address_0x)
         return _contract_
     return _contract_
 

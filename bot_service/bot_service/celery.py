@@ -10,9 +10,11 @@ app = Celery('bot_service')
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
-
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+
+app.control.add_consumer('update_handler', reply=True)
+# app.control.autoscale(3, 10)
 
 
 @app.task(bind=True)

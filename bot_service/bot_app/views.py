@@ -1,8 +1,8 @@
 import json
 import os
-import sys
-import threading
 import logging
+import threading
+from time import sleep
 
 from django.http import HttpResponse, JsonResponse
 from django.views import View
@@ -17,7 +17,6 @@ from bot_app.handlers.create_contract_handlers import erc20_handler
 from bot_service.settings import env
 from utils import bot_request_utils as request_utils, handlers_utils as utils, session_utils
 from telegram import Bot, Update
-import telegram.error
 from telegram.ext import (Updater, CommandHandler, Dispatcher)
 from bot_app.models import TelegramMessage
 from bot_app import tasks
@@ -27,12 +26,10 @@ DEBUG = env('DEBUG')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 TELEGRAM_URL = os.getenv('TELEGRAM_URL')
 WEB_HOOK_URL = os.getenv('WEB_HOOK_URL')
-bot = Bot(BOT_TOKEN)
-try:
-    TELEGRAM_BOT_USERNAME = bot.get_me()["username"]
-except telegram.error.Unauthorized:
-    logging.error(f"Invalid TELEGRAM_TOKEN.")
-    sys.exit(1)
+
+n_workers = 1 if DEBUG else 4
+bot = Bot(token=BOT_TOKEN)
+_updater_ = Updater(token=BOT_TOKEN, workers=n_workers)
 
 
 def setup_dispatcher(dp):
@@ -58,52 +55,38 @@ def setup_dispatcher(dp):
     return dp
 
 
-def run_pooling():
-    updater = Updater(BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
-    setup_dispatcher(dp)
+def run_pooling(dispatcher: Dispatcher):
+    setup_dispatcher(dispatcher)
 
     # it is really useful to send '👋' emoji to developer
     # when you run local test
     # bot.send_message(text='👋', chat_id=<YOUR TELEGRAM ID>)
-    bot.delete_webhook()
-    bot.set_webhook(TELEGRAM_URL + BOT_TOKEN + "/setWebhook?url=" + WEB_HOOK_URL + "/bot/webhook_post/")
-    # updater.start_polling()
-    bot_info = Bot(BOT_TOKEN).get_me()
+    dispatcher.bot.delete_webhook()
+    dispatcher.bot.set_webhook(f"{TELEGRAM_URL}{BOT_TOKEN}/setWebhook?url={WEB_HOOK_URL}/bot/webhook_post/")
+    bot_info = dispatcher.bot.get_me()
     bot_link = f"https://t.me/" + bot_info["username"]
-    logger.info(bot.getWebhookInfo().to_json())
+    logger.info(dispatcher.bot.getWebhookInfo())
     logger.info(f"Pooling of '{bot_link}' started")
-
-
-t = threading.Thread(name='bot', target=run_pooling)
-t.setDaemon(True)
-t.start()
 
 
 @csrf_exempt
 def start_bot(request) -> HttpResponse:
     logger.info("START_BOT_REQUEST")
-    # t.start()
+    run_pooling(_updater_.dispatcher)
     return HttpResponse("START_BOT_RESPONSE")
 
 
 class TelegramBotWebhookView(View):
-    # WARNING: if fail - Telegram webhook will be delivered again.
-    # Can be fixed with async celery task execution
     def post(self, request, *args, **kwargs):
 
-        # TODO add load balancer
-        process_telegram_event(json.loads(request.body))
-
-        # if DEBUG == 'True':
-        #     process_telegram_event(json.loads(request.body))
-        # else:
-        #     # TODO CELERY
-        #     # Process Telegram event in Celery worker (async)
-        #     # Don't forget to run it and & Redis (message broker for Celery)!
-        #     # Read Procfile for details
-        #     # You can run all of these services via docker-compose.yml
-        #     tasks.process_telegram_event.s(json.loads(request.body)).on_error(tasks.error_handler.s()).apply_async()
+        if not bool(DEBUG):
+            update_from_queue = tasks.update_handler(json.loads(request.body))
+            process_telegram_event(update_from_queue)
+        else:
+            update_from_queue = tasks.update_handler.s(json.loads(request.body))\
+                .on_error(tasks.error_handler.s())\
+                .apply_async()
+            process_telegram_event(update_from_queue.get())
 
         return JsonResponse({"ok": "POST request processed"})
 
@@ -112,13 +95,23 @@ class TelegramBotWebhookView(View):
 
 
 def process_telegram_event(update_json):
-    update = Update.de_json(update_json, bot)
+    update = Update.de_json(update_json, _updater_.bot)
     if request_utils.is_bot(update):
         return
 
-    # TODO thread safety explore
-    session_utils.get_session_store(update)
+    ss = session_utils.get_session_store(update)
 
+    if ss.has_key(str(update['update_id'])):
+        logger.warning("Message " + str(update['update_id']) + " is not processed")
+        return
+    else:
+        ss.__setitem__(str(update['update_id']), str(update['update_id']))
+        ss.save()
+        logger.info(f"update_id: {ss.get(str(update['update_id']))}")
+    _updater_.dispatcher.process_update(update)
+
+
+def save_message(update):
     message = utils.convert_update_to_telegram_message(update)
     try:
         _message_ = TelegramMessage.objects(update_id=message.update_id)
@@ -129,8 +122,7 @@ def process_telegram_event(update_json):
         logger.info("Message saved: " + update.to_json())
     except Exception as exc:
         logger.error(exc)
-    dispatcher.process_update(update)
 
 
-n_workers = 1 if DEBUG else 4
-dispatcher = setup_dispatcher(Dispatcher(bot, update_queue=None, workers=n_workers, use_context=True))
+if bool(DEBUG):
+    run_pooling(_updater_.dispatcher)
