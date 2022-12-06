@@ -77,7 +77,8 @@ def start_bot(request) -> HttpResponse:
 
 
 class TelegramBotWebhookView(View):
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
 
         if not bool(DEBUG):
             update_from_queue = tasks.update_handler(json.loads(request.body))
@@ -90,7 +91,8 @@ class TelegramBotWebhookView(View):
 
         return JsonResponse({"ok": "POST request processed"})
 
-    def get(self, request, *args, **kwargs):  # for debug
+    @staticmethod
+    def get(request, *args, **kwargs):  # for debug
         return JsonResponse({"ok": "Get request received! But nothing done"})
 
 
