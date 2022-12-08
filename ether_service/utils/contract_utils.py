@@ -104,6 +104,8 @@ def get_contract(owner_address, contract_address, source: str) -> _DeployedContr
             _contract_ = Contract(contract_address)
         elif source == EXPLORER:
             _contract_ = get_contract_from_explorer(owner_address, contract_address)
+        elif source == ABI:
+            _contract_ = get_contract_from_abi(owner_address, contract_address, ERC20_CONTRACT_NAME)
         address_0x = f'alias_{contract_address}'
         _contract_.set_alias(address_0x)
         return _contract_

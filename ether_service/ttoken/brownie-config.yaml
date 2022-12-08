@@ -29,8 +29,9 @@ networks:
         priority_fee: null
         reverting_tx_gas_limit: false
         default_contract_owner: false
-    ropsten:
-        host: https://ropsten.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+    goerli:
+        host: https://goerli.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+
 
 compiler:
     evm_version: istanbul
