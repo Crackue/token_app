@@ -7,7 +7,7 @@ services:
     container_name: bot-service
     build:
       context: ./bot_service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.web
     depends_on:
       - redis
     command: gunicorn bot_service.wsgi:application --bind 0.0.0.0:8002
@@ -55,7 +55,8 @@ services:
     networks:
       - main
 
-  celery:
+  ether_celery:
+    container_name: ether-service-celery
     restart: always
     build:
       context: ./ether_service
@@ -73,7 +74,25 @@ services:
     networks:
       - main
 
+  bot_celery:
+    container_name: bot-service-celery
+    restart: always
+    build:
+      context: ./bot_service
+      dockerfile: Dockerfile.worker
+    command: celery -A bot_service worker -l info
+    volumes:
+      - ./app:/app
+    env_file:
+      - ./.env.test
+    depends_on:
+      - botservice
+      - redis
+    networks:
+      - main
+
   flower:
+    container_name: ether-service-flower
     build:
       context: ./ether_service
       dockerfile: Dockerfile.worker
